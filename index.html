@@ -1,669 +1,132 @@
-<link rel="stylesheet" href="style.css">
-
 <!DOCTYPE html>
-
-<h1>🐝 蜂場管理行事曆</h1>
-
-<h2>(一) 婚飛交尾日期 (反推)</h2>
-
-<p>輸入「希望」的婚飛交尾目標日，反推出「最遲」的開始培育日。</p>
-
-<label for="targetMatingDate">目標交尾日期：</label>
-
-<input type="date" id="targetMatingDate">
-
-<button id="btnMatingPlanner">計算 (反推)</button>
-
-<hr> 
-
-<div>
-
-  <p>新蜂王最遲培育日 (需 23 天)： <b id="queenStartDate" class="result result-queen">---</b></p>
-
-  <p>雄蜂最遲培育日 (需 38 天)： <b id="droneStartDate" class="result result-drone">---</b></p>
-
-</div>
-
-<br><hr><br>
-
-<h2>(二) 蜂王培育批次管理 (工作清單)</h2>
-
-<p>輸入您的「移蟲日」，自動生成育王工作的完整排程。</p>
-
-<label for="graftingDate">移蟲日 (第 0 天)：</label>
-
-<input type="date" id="graftingDate">
-
-<button id="btnRearingBatch">計算 (正推)</button>
-
-<hr>
-
-<div style="line-height: 2.0;">
-
-  <p>第 0 天 (移蟲日)： <b id="graftDate" class="result" style="color: #303f9f;">---</b></p>
-
-  <p>第 1 天 (檢查接受率)： <b id="acceptDate" class="result" style="color: #303f9f;">---</b></p>
-
-  <p>第 5 天 (王台封蓋)： <b id="cappingDate" class="result" style="color: #303f9f;">---</b></p>
-
-  <p>第 10 天 (準備核心群/分蜂)： <b id="prepNucDate" class="result" style="color: #303f9f;">---</b></p>
-
-  <p>第 11-12 天 (移王台 / 關王)： <b id="moveCellDate" class="result result-critical">---</b></p>
-
-  <p>第 13-14 天 (檢查出台)： <b id="emergenceDate" class="result" style="color: #303f9f;">---</b></p>
-
-  <p>第 19-21 天 (檢查婚飛)： <b id="matingDate" class="result" style="color: #303f9f;">---</b></p>
-
-  <p>第 22-25 天 (檢查產卵)： <b id="layingDate" class="result" style="color: #00796b; font-weight:bold;">---</b></p>
-
-</div>
-
-<br><hr><br>
-
-<h2>(三) 蜂蟹蟎 (Varroa) 治療期</h2>
-
-<p>輸入「關王日」或「分蜂日」(蜂群無王狀態開始日)，抓出無蟲蛹期，這是使用草酸的黃金時機。</p>
-
-<label for="cagingDate">關王/無王開始日：</label>
-
-<input type="date" id="cagingDate">
-
-<button id="btnVarroa">計算 (正推)</button>
-
-<hr>
-
-<div style="line-height: 2.0;">
-
-  <p>工蜂全部羽化日 (關王 +21 天)： <b id="workerEmergenceDate" class="result result-critical">---</b></p>
-
-  <p>雄蜂全部羽化日 (關王 +24 天)： <b id="droneEmergenceDate" class="result result-critical">---</b></p>
-
-  <p><b>(建議用藥期：關王後 第 21 ~ 24 天)</b></p>
-
-</div>
-
-<br><hr><br>
-
-<h2>(四) 分蜂 / 核心群 (Nuc) 計畫</h2>
-
-<p>輸入您「預計分蜂的日期」，反推您最遲何時該開始育王。</p>
-
-<label for="targetSwarmDate">預計分蜂日期：</label>
-
-<input type="date" id="targetSwarmDate">
-
-<button id="btnSwarm">計算 (反推)</button>
-
-<hr>
-
-<div style="line-height: 2.0;">
-
-  <p>最遲移蟲日 (若需成熟王台)： <b id="graftForCellDate" class="result" style="color: #6a1b9a;">---</b></p>
-
-  <p>最遲移蟲日 (若需處女王)： <b id="graftForVirginDate" class="result result-critical">---</b></p>
-
-</div>
-
-<br><hr><br>
-
-<h2>(五) 流蜜期與獎勵飼餵</h2>
-
-<p>輸入「預估主要流蜜期開始日」，規劃養大群與用藥安全期。</p>
-
-<label for="honeyFlowDate">預估流蜜期開始日：</label>
-
-<input type="date" id="honeyFlowDate">
-
-<button id="btnHoneyFlow">計算 (反推)</button>
-
-<hr>
-
-<div style="line-height: 2.0;">
-
-  <p>開始獎勵飼餵日 (提前 4 週)： <b id="startFeedingDate" class="result" style="color: #00796b;">---</b></p>
-
-  <p>用藥最晚移除日 (提前 2 週)： <b id="removeMedsDate" class="result result-critical">---</b></p>
-
-</div>
-
-<br><hr><br>
-
-<h2>(六) 糖水 (飼料) 混合計算機</h2>
-
-<p>計算調配飼料所需材料。(註：比例均為「重量比」)</p>
-
-<h3>A: 液體糖水 (依體積)</h3>
-
-<p>計算達到「目標公升數 (L)」所需的材料。</p>
-
-<label for="syrupRatio">選擇糖水比例 (糖:水)：</label>
-
-<select id="syrupRatio" style="width: auto;">
-
-  <option value="1:2">1:2 (輕度獎勵)</option>
-
-  <option value="1:1" selected>1:1 (獎勵飼餵)</option>
-
-  <option value="1.5:1">1.5:1 (中度飼餵)</option>
-
-  <option value="2:1">2:1 (越冬飼料)</option>
-
-</select>
-
-<br><br>
-
-<label for="totalVolume">需要總公升數 (L)：</label>
-
-<input type="number" id="totalVolume" value="100">
-
-<button id="btnSyrup">計算 (液體)</button>
-
-<hr>
-
-<div style="line-height: 2.0;">
-
-  <p>需要 <b>白糖 (蔗糖)</b>： <b id="sugarKg" class="result" style="color: #d32f2f; font-size: 1.2em;">---</b> 公斤 (kg)</p>
-
-  <p>需要 <b>水</b>： <b id="waterL" class="result" style="color: #1976d2; font-size: 1.2em;">---</b> 公升 (L)</p>
-
-  <small>(註：計算基於 1kg 糖溶解後體積約 0.63 L)</small>
-
-</div>
-
-<br>
-
-<h3>B: 固體飼料/糖漿 (依重量)</h3>
-
-<p>計算達到「目標公斤數 (kg)」所需的材料。</p>
-
-<label for="solidRatio">選擇飼料類型：</label>
-
-<select id="solidRatio" style="width: auto;">
-
-  <option value="fondant_5_1">蜂糖 (Fondant 5:1 糖:水)</option>
-
-  <option value="pollen_2_1">花粉餅 (2:1 糖:花粉)</option>
-
-</select>
-
-<br><br>
-
-<label for="totalWeight">需要總公斤數 (kg)：</label>
-
-<input type="number" id="totalWeight" value="10">
-
-<button id="btnSolidFeed">計算 (固體)</button>
-
-<hr>
-
-<div style="line-height: 2.0;">
-
-  <p>需要 <b>白糖 (蔗糖)</b>： <b id="solidSugarKg" class="result" style="color: #d32f2f; font-size: 1.2em;">---</b> 公斤 (kg)</p>
-
-  <p>需要 <b id="solidLiquidLabel">水</b>： <b id="solidWaterL" class="result" style="color: #1976d2; font-size: 1.2em;">---</b> 公升 (L)</p>
-
-  <p>需要 <b>花粉</b>： <b id="solidPollenKg" class="result" style="color: #f57f17; font-size: 1.2em;">---</b> 公斤 (kg)</p>
-
-  <small id="solidNote" style="color: #555;">(註：花粉餅可能還需額外加水/糖水調和)</small>
-
-</div>
-
-<br><hr><br>
-
-<h2>(七) 蜂場工作清單 (To-Do List)</h2>
-
-<p>快速產生每日工作排程，可直接複製到LINE群組指派工作。</p>
-
-<label for="taskDate">工作日期：</label>
-
-<input type="date" id="taskDate">
-
-<br><br>
-
-<label for="hiveNumbers">蜂箱編號：</label>
-
-<input type="text" id="hiveNumbers" placeholder="例如：1-20, 35, A-01~A-10" style="width: 250px;">
-
-<br><br>
-
-<label>工作項目 (可多選)：</label>
-
-<div id="taskCheckboxes" class="check-group">
-
-  <div><input type="checkbox" id="task1" value="餵 1:1 糖水"> <label for="task1">餵 1:1 糖水</label></div>
-
-  <div><input type="checkbox" id="task2" value="餵 2:1 糖水"> <label for="task2">餵 2:1 糖水</label></div>
-
-  <div><input type="checkbox" id="task3" value="餵花粉餅"> <label for="task3">餵花粉餅</label></div>
-
-  <div><input type="checkbox" id="task4" value="檢查產卵"> <label for="task4">檢查產卵</label></div>
-
-  <div><input type="checkbox" id="task5" value="檢查王台"> <label for="task5">檢查王台</label></div>
-
-  <div><input type="checkbox" id="task6" value="蜂蟹蟎治療"> <label for="task6">蜂蟹蟎治療</label></div>
-
-  <div><input type="checkbox" id="task7" value="巢脾調整"> <label for="task7">巢脾調整</label></div>
-
-  <div><input type="checkbox" id="task8" value="繼箱作業"> <label for="task8">繼箱作業</label></div>
-
-  <div><input type="checkbox" id="task9" value="採蜜"> <label for="task9">採蜜</label></div>
-
-</div>
-
-<br>
-
-<label for="otherTask">其他項目：</label>
-
-<input type="text" id="otherTask" placeholder="輸入自訂任務" style="width: 250px;">
-
-<br><br>
-
-<button id="btnToDoList">產生清單</button>
-
-<hr>
-
-<label for="toDoListOutput">可複製清單內容：</label>
-
-<textarea id="toDoListOutput" rows="10"></textarea>
-
-<br><hr><br>
-
-<h2>(八) 蜂蜜採收與利潤 (Profit) 計算機</h2>
-
-<p>快速估算您的採收效益與淨利潤。</p>
-
-<label>採收箱數：</label>
-
-<input type="number" id="harvestBoxes" class="profit-input"> 箱
-
-<br>
-
-<label>平均採收 (kg/箱)：</label>
-
-<input type="number" id="avgKgPerBox" class="profit-input"> kg
-
-<br>
-
-<label>蜂蜜售價 ($/kg)：</label>
-
-<input type="number" id="pricePerKg" class="profit-input"> 元
-
-<br>
-
-<label>平均成本 ($/箱)：</label>
-
-<input type="number" id="costPerBox" class="profit-input" placeholder="糖/藥/瓶/人工"> 元
-
-<br>
-
-<button id="btnProfit">計算 (利潤)</button>
-
-<hr>
-
-<div style="line-height: 2.2;">
-
-  <p>總採收量： <b id="totalHarvest" class="profit-result result-profit">---</b> kg</p>
-
-  <p>預估總收入： <b id="totalRevenue" class="profit-result result-profit">---</b> 元</p>
-
-  <p>預估總成本： <b id="totalCost" class="profit-result result-cost">---</b> 元</p>
-
-  <p><b>預估淨利潤： <b id="netProfit" class="profit-result result-cost" style="font-size: 1.3em;">---</b> 元</b></p>
-
-  <p>平均每箱淨利： <b id="profitPerBox" class="profit-result" style="color: #303f9f;">---</b> 元</p>
-
-</div>
-
-<br><hr><br>
-
-<h2>(九) 蜂場用藥紀錄</h2>
-
-<p>簡易記錄蜂場用藥情況，內容會附加在下方文字區。</p>
-
-<div class="log-grid">
-
-  <label for="medicationDate">用藥日期：</label>
-
-  <input type="date" id="medicationDate">
-
-  <label for="medicationHives">蜂箱編號：</label>
-
-  <input type="text" id="medicationHives" placeholder="例如：1-10, A-05">
-
-  <label for="medicationName">藥品名稱：</label>
-
-  <input type="text" id="medicationName" placeholder="例如：草酸, 蟻酸, ApiGuard">
-
-  <label for="medicationDosage">使用劑量：</label>
-
-  <input type="text" id="medicationDosage" placeholder="例如：30ml 滴流, 1片">
-
-  
-
-  <label for="medicationNotes">備註：</label>
-
-  <input type="text" id="medicationNotes" placeholder="例如：天氣晴朗, 移除藥片日 10/30">
-
-</div>
-
-<br>
-
-<button id="btnLogMedication">紀錄用藥</button>
-
-<hr>
-
-<label for="medicationLogOutput">用藥日誌 (注意：此處紀錄不會自動儲存，請自行複製)</label>
-
-<textarea id="medicationLogOutput" rows="10"></textarea>
-
-<br><hr><br>
-
-<h2>(十) 蜂王標記顏色 (速查)</h2>
-
-<p>依據國際標準，自動標示當年顏色。</p>
-
-<div class="color-guide">
-
-    <span id="color-blue" class="color-swatch" style="background-color: #add8e6; color: #000;">藍 (0, 5)</span>
-
-    <span id="color-white" class="color-swatch" style="background-color: #fff; border: 1px solid #ccc; color: #000;">白 (1, 6)</span>
-
-    <span id="color-yellow" class="color-swatch" style="background-color: #ffffe0; color: #000;">黃 (2, 7)</span>
-
-    <span id="color-red" class="color-swatch" style="background-color: #f08080; color: #fff;">紅 (3, 8)</span>
-
-    <span id="color-green" class="color-swatch" style="background-color: #90ee90; color: #000;">綠 (4, 9)</span>
-
-</div>
-
-<br><hr><br>
-
-<h2>(十一) 蜂箱檢查日誌</h2>
-
-<p>快速記錄巡場時的蜂箱狀況。</p>
-
-<div class="log-grid">
-
-    <label for="inspectionDate">檢查日期：</label>
-
-    <input type="date" id="inspectionDate">
-
-    <label for="inspectionHives">蜂箱編號：</label>
-
-    <input type="text" id="inspectionHives" placeholder="例如：A-01 (建議單箱紀錄)">
-
-    <label for="inspectionQueenStatus">蜂王狀態：</label>
-
-    <div class="check-group">
-
-        <input type="checkbox" id="queenSeen"> <label for="queenSeen">見王</label>
-
-        <input type="checkbox" id="eggsSeen"> <label for="eggsSeen">見卵</label>
-
-        <input type="checkbox" id="larvaSeen"> <label for="larvaSeen">見幼蟲</label>
-
-        <input type="checkbox" id="queenMissing"> <label for="queenMissing">缺王</label>
-
-        <input type="checkbox" id="queenCell"> <label for="queenCell">有王台</label>
-
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bee Expert 蜂場管理行事曆</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <h1>🐝 蜂場管理行事曆</h1>
+
+    <div class="section-container">
+        <h2>(七) 蜂場工作清單 (To-Do List)</h2>
+        <p>快速產生每日工作排程，可直接複製到LINE群組指派工作。</p>
+        <label for="taskDate">工作日期：</label>
+        <input type="date" id="taskDate">
+        <br><br>
+        <label for="hiveNumbers">蜂箱編號：</label>
+        <input type="text" id="hiveNumbers" placeholder="例如：1-20, 35, A-01~A-10" style="width: 250px;">
+        <br><br>
+        <label>工作項目 (可多選)：</label>
+        <div id="taskCheckboxes" class="check-group">
+            <div><input type="checkbox" id="task1" value="餵 1:1 糖水"> <label for="task1">餵 1:1 糖水</label></div>
+            <div><input type="checkbox" id="task2" value="餵 2:1 糖水"> <label for="task2">餵 2:1 糖水</label></div>
+            <div><input type="checkbox" id="task3" value="餵花粉餅"> <label for="task3">餵花粉餅</label></div>
+            <div><input type="checkbox" id="task4" value="檢查產卵"> <label for="task4">檢查產卵</label></div>
+            <div><input type="checkbox" id="task5" value="檢查王台"> <label for="task5">檢查王台</label></div>
+            <div><input type="checkbox" id="task6" value="蜂蟹蟎治療"> <label for="task6">蜂蟹蟎治療</label></div>
+            <div><input type="checkbox" id="task7" value="巢脾調整"> <label for="task7">巢脾調整</label></div>
+            <div><input type="checkbox" id="task8" value="繼箱作業"> <label for="task8">繼箱作業</label></div>
+            <div><input type="checkbox" id="task9" value="採蜜"> <label for="task9">採蜜</label></div>
+        </div>
+        <br>
+        <label for="otherTask">其他項目：</label>
+        <input type="text" id="otherTask" placeholder="輸入自訂任務" style="width: 250px;">
+        <br><br>
+        <button id="btnToDoList">產生清單</button>
+        <hr>
+        <label for="toDoListOutput">可複製清單內容：</label>
+        <textarea id="toDoListOutput" rows="10"></textarea>
+        <button class="btn-copy" onclick="copyToClipboard('toDoListOutput')">📋 複製工作清單</button>
     </div>
 
-    <label for="inspectionBroodFrames">巢脾數：</label>
+    <br><hr><br>
 
-    <input type="number" id="inspectionBroodFrames" placeholder="總脾數 (例如: 8)">
+    <h2>(九) 蜂場用藥紀錄</h2>
+    <p>簡易記錄蜂場用藥情況。</p>
+    <div class="log-grid">
+        <label for="medicationDate">用藥日期：</label>
+        <input type="date" id="medicationDate">
+        <label for="medicationHives">蜂箱編號：</label>
+        <input type="text" id="medicationHives" placeholder="例如：1-10, A-05">
+        <label for="medicationName">藥品名稱：</label>
+        <input type="text" id="medicationName" placeholder="例如：草酸, 蟻酸">
+        <label for="medicationDosage">使用劑量：</label>
+        <input type="text" id="medicationDosage" placeholder="例如：30ml 滴流">
+        <label for="medicationNotes">備註：</label>
+        <input type="text" id="medicationNotes" placeholder="例如：天氣晴朗">
+    </div>
+    <br>
+    <button id="btnLogMedication">紀錄用藥</button>
+    <hr>
+    <label for="medicationLogOutput">用藥日誌：</label>
+    <textarea id="medicationLogOutput" rows="10"></textarea>
+    <button class="btn-copy" onclick="copyToClipboard('medicationLogOutput')">📋 複製用藥紀錄</button>
 
+    <br><hr><br>
+
+    <h2>(十) 蜂王標記顏色 (自動年份偵測)</h2>
+    <p>依據國際標準，系統已自動為您標示今年與明年的顏色。</p>
     
-
-    <label for="inspectionPests">病蟲害：</label>
-
-    <div class="check-group">
-
-        <input type="checkbox" id="pestVarroa"> <label for="pestVarroa">蜂蟹蟎 (高)</label>
-
-        <input type="checkbox" id="pestWaxMoth"> <label for="pestWaxMoth">巢蟲</label>
-
-        <input type="checkbox" id="pestDisease"> <label for="pestDisease">幼蟲病 (疑)</label>
-
+    <div id="year-display" style="text-align: center; font-size: 1.2em; margin-bottom: 10px;">
+        今年是：<span id="currentYearText" style="font-weight: bold; color: #d32f2f;">---</span>
     </div>
 
-    
-
-    <label for="inspectionActions">處理動作：</label>
-
-    <div class="check-group">
-
-        <input type="checkbox" id="actionAddFrame"> <label for="actionAddFrame">加脾</label>
-
-        <input type="checkbox" id="actionRemoveFrame"> <label for="actionRemoveFrame">抽脾</label>
-
-        <input type="checkbox" id="actionFeed"> <label for="actionFeed">餵食</label>
-
-        <input type="checkbox" id="actionDestroyCell"> <label for="actionDestroyCell">介入王台</label>
-
+    <div class="color-guide">
+        <div id="color-blue" class="color-swatch" data-year="0,5" style="background-color: #add8e6; color: #000;">藍 (0, 5)</div>
+        <div id="color-white" class="color-swatch" data-year="1,6" style="background-color: #fff; border: 1px solid #ccc; color: #000;">白 (1, 6)</div>
+        <div id="color-yellow" class="color-swatch" data-year="2,7" style="background-color: #ffffe0; color: #000;">黃 (2, 7)</div>
+        <div id="color-red" class="color-swatch" data-year="3,8" style="background-color: #f08080; color: #fff;">紅 (3, 8)</div>
+        <div id="color-green" class="color-swatch" data-year="4,9" style="background-color: #90ee90; color: #000;">綠 (4, 9)</div>
     </div>
 
-    <label for="inspectionNotes">備註：</label>
-
-    <input type="text" id="inspectionNotes" placeholder="例如：蜂群強壯, 蜜足">
-
-</div>
-
-<br>
-
-<button id="btnLogInspection">紀錄檢查</button>
-
-<hr>
-
-<label for="inspectionLogOutput">蜂箱日誌 (注意：此處紀錄不會自動儲存，請自行複製)</label>
-
-<textarea id="inspectionLogOutput" rows="15"></textarea>
-
-<br><hr><br>
-
-<h2>(十二) 蜂王狀態與譜系追蹤</h2>
-
-<p>用來追蹤關鍵蜂王(種王)的生命週期與表現。</p>
-
-<div class="log-grid">
-
-    <label for="queenId">蜂王編號：</label>
-
-    <input type="text" id="queenId" placeholder="例如：2025-Red-01 (必填)">
-
-    
-
-    <label for="queenSource">來源：</label>
-
-    <input type="text" id="queenSource" placeholder="例如：自家培育 (v2.0 批次), 義大利購入">
-
-    
-
-    <label for="queenHatchDate">出台日：</label>
-
-    <input type="date" id="queenHatchDate">
-
-    
-
-    <label for="queenMateDate">婚飛日 (估)：</label>
-
-    <input type="date" id="queenMateDate">
-
-    
-
-    <label for="queenLayDate">產卵日：</label>
-
-    <input type="date" id="queenLayDate">
-
-    
-
-    <label for="queenStatus">目前狀態：</label>
-
-    <select id="queenStatus" style="width: auto;">
-
-        <option value="強壯 (In Service)">強壯 (In Service)</option>
-
-        <option value="一般 (In Service)">一般 (In Service)</option>
-
-        <option value="觀察中 (Watching)">觀察中 (Watching)</option>
-
-        <option value="衰退 (Failing)">衰退 (Failing)</option>
-
-        <option value="已更換 (Replaced)">已更換 (Replaced)</option>
-
-    </select>
-
-    
-
-    <label for="queenNotes">備註：</label>
-
-    <input type="text" id="queenNotes" placeholder="例如：產卵圈漂亮, 現於 A-03 箱">
-
-</div>
-
-<br>
-
-<button id="btnLogQueen">紀錄/更新蜂王</button>
-
-<hr>
-
-<label for="queenLogOutput">蜂王譜系日誌 (注意：此處紀錄不會自動儲存，請自行複製)</label>
-
-<textarea id="queenLogOutput" rows="10"></textarea>
-
-<br><hr><br>
-
-<h2>(十三) 蜂場地點管理 (移動日誌)</h2>
-
-<p>記錄蜂群在不同蜂場之間的調度。</p>
-
-<div class="log-grid">
-
-    <label for="moveDate">移動日期：</label>
-
-    <input type="date" id="moveDate">
-
-    <label for="moveHives">蜂箱編號：</label>
-
-    <input type="text" id="moveHives" placeholder="例如：A01-A20 (共20箱)">
-
-    
-
-    <label for="moveFrom">移出地點：</label>
-
-    <input type="text" id="moveFrom" placeholder="例如：苗栗A場 (自家)">
-
-    
-
-    <label for="moveTo">移入地點：</label>
-
-    <input type="text" id="moveTo" placeholder="例如：台中B場 (龍眼蜜區)">
-
-    
-
-    <label for="moveReason">原因：</label>
-
-    <input type="text" id="moveReason" placeholder="例如：追花蜜, 分蜂, 避冬">
-
-</div>
-
-<br>
-
-<button id="btnLogApiaryMove">紀錄移動</button>
-
-<hr>
-
-<label for="apiaryLogOutput">蜂場移動日誌 (注意：此處紀錄不會自動儲存，請自行複製)</label>
-
-<textarea id="apiaryLogOutput" rows="10"></textarea>
-
-<br><hr><br>
-
-<h2>(十四) 實際採收與費用日誌</h2>
-
-<p>記錄實際的收入與支出，用於精確的年終結算。</p>
-
-<h3>A: 實際採收日誌</h3>
-
-<div class="log-grid">
-
-    <label for="harvestLogDate">採收日期：</label>
-
-    <input type="date" id="harvestLogDate">
-
-    
-
-    <label for="harvestLogSource">蜜源/品項：</label>
-
-    <input type="text" id="harvestLogSource" placeholder="例如：龍眼蜜 (A場), 荔枝蜜, 蜂王乳">
-
-    
-
-    <label for="harvestLogKg">總公斤 (kg)：</label>
-
-    <input type="number" id="harvestLogKg" placeholder="例如：350">
-
-    
-
-    <label for="harvestLogPrice">銷售單價 ($/kg)：</label>
-
-    <input type="number" id="harvestLogPrice" placeholder="例如：180">
-
-    
-
-    <label for="harvestLogNotes">備註：</label>
-
-    <input type="text" id="harvestLogNotes" placeholder="例如：批次 2025-H1, 含水量 19%">
-
-</div>
-
-<br>
-
-<button id="btnLogHarvest">紀錄採收</button>
-
-<hr>
-
-<label for="harvestLogOutput">採收日誌 (注意：此處紀錄不會自動儲存，請自行複製)</label>
-
-<textarea id="harvestLogOutput" rows="10"></textarea>
-
-<br>
-
-<h3>B: 營運費用日誌</h3>
-
-<div class="log-grid">
-
-    <label for="expenseLogDate">費用日期：</label>
-
-    <input type="date" id="expenseLogDate">
-
-    
-
-    <label for="expenseLogItem">項目：</label>
-
-    <input type="text" id="expenseLogItem" placeholder="例如：台糖 100kg, 蟻酸, 玻璃瓶 500支">
-
-    
-
-    <label for="expenseLogAmount">總金額 ($)：</label>
-
-    <input type="number" id="expenseLogAmount" placeholder="例如：3200">
-
-    
-
-    <label for="expenseLogNotes">備註：</label>
-
-    <input type="text" id="expenseLogNotes" placeholder="例如：用於B場越冬, 藥品耗材">
-
-</div>
-
-<br>
-
-<button id="btnLogExpense">紀錄費用</button>
-
-<hr>
-
-<label for="expenseLogOutput">費用日誌 (注意：此處紀錄不會自動儲存，請自行複製)</label>
-
-<textarea id="expenseLogOutput" rows="10"></textarea>
-
-<script src="script.js"></script>
+    <br><hr><br>
+
+    <h2>(十一) 蜂箱檢查日誌</h2>
+    <button id="btnLogInspection">紀錄檢查</button>
+    <hr>
+    <label for="inspectionLogOutput">蜂箱日誌：</label>
+    <textarea id="inspectionLogOutput" rows="15"></textarea>
+    <button class="btn-copy" onclick="copyToClipboard('inspectionLogOutput')">📋 複製檢查日誌</button>
+
+    <br><hr><br>
+
+    <h2>(十二) 蜂王狀態與譜系追蹤</h2>
+    <button id="btnLogQueen">紀錄/更新蜂王</button>
+    <hr>
+    <label for="queenLogOutput">蜂王譜系日誌：</label>
+    <textarea id="queenLogOutput" rows="10"></textarea>
+    <button class="btn-copy" onclick="copyToClipboard('queenLogOutput')">📋 複製蜂王日誌</button>
+
+    <br><hr><br>
+
+    <h2>(十三) 蜂場地點管理</h2>
+    <button id="btnLogApiaryMove">紀錄移動</button>
+    <hr>
+    <label for="apiaryLogOutput">蜂場移動日誌：</label>
+    <textarea id="apiaryLogOutput" rows="10"></textarea>
+    <button class="btn-copy" onclick="copyToClipboard('apiaryLogOutput')">📋 複製移動日誌</button>
+
+    <br><hr><br>
+
+    <h2>(十四) 實際採收與費用日誌</h2>
+    <button id="btnLogHarvest">紀錄採收</button>
+    <hr>
+    <label for="harvestLogOutput">採收日誌：</label>
+    <textarea id="harvestLogOutput" rows="10"></textarea>
+    <button class="btn-copy" onclick="copyToClipboard('harvestLogOutput')">📋 複製採收日誌</button>
+    <br>
+    <button id="btnLogExpense">紀錄費用</button>
+    <hr>
+    <label for="expenseLogOutput">費用日誌：</label>
+    <textarea id="expenseLogOutput" rows="10"></textarea>
+    <button class="btn-copy" onclick="copyToClipboard('expenseLogOutput')">📋 複製費用日誌</button>
+
+    <br><br><br>
+
+    <script src="script.js"></script>
+</body>
+</html>
