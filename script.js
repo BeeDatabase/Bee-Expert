@@ -229,3 +229,4 @@ function getDate(id) { return document.getElementById(id).value ? new Date(docum
 function addDays(d, n) { let newD = new Date(d); newD.setDate(newD.getDate()+n); return newD.toISOString().split('T')[0]; }
 function setText(id, t) { document.getElementById(id).innerText = t; }
 function copyToClipboard(id) { navigator.clipboard.writeText(document.getElementById(id).value); alert("已複製"); }
+
