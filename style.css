@@ -1,68 +1,47 @@
-/* ================= Bee Expert V3.5 核心樣式 ================= */
+/* ================= Bee Expert V3.6 (Full Features) ================= */
 
-/* 1. 全局變數定義 */
+/* 1. 全局變數 */
 :root {
-    /* 蜂蜜金主題色 */
     --primary-gradient: linear-gradient(135deg, #FFC107 0%, #FF9800 100%);
     --primary-color: #FF9800;
-    --secondary-color: #263238; /* 深灰黑 */
-    
-    /* 背景與玻璃效果 */
+    --secondary-color: #263238;
     --bg-color: #f0f2f5;
     --glass-bg: rgba(255, 255, 255, 0.9);
     --glass-border: 1px solid rgba(255, 255, 255, 0.5);
     --shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-    
-    /* 文字顏色 */
     --text-main: #333;
     --text-light: #666;
 }
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
 body {
     font-family: 'Noto Sans TC', sans-serif;
     background-color: var(--bg-color);
     color: var(--text-main);
-    margin: 0;
-    padding: 0;
-    padding-bottom: 80px; /* 留給手機底部導覽的空間 */
+    margin: 0; padding: 0; padding-bottom: 80px;
 }
 
-/* 2. 頂部導覽列 (懸浮金條) */
+/* 2. 頂部導覽列 */
 .top-nav {
     background: var(--primary-gradient);
     color: #fff;
     padding: 15px 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    position: sticky;
-    top: 0;
-    z-index: 100;
+    display: flex; justify-content: space-between; align-items: center;
+    position: sticky; top: 0; z-index: 100;
     box-shadow: 0 4px 10px rgba(255, 152, 0, 0.3);
 }
-
-.nav-brand {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
+.nav-brand { display: flex; align-items: center; gap: 10px; }
 .brand-icon .material-icons-round {
-    font-size: 2rem;
-    background: rgba(255,255,255,0.2);
-    border-radius: 50%;
-    padding: 5px;
+    font-size: 2rem; background: rgba(255,255,255,0.2);
+    border-radius: 50%; padding: 5px;
 }
 .brand-text h1 { margin: 0; font-size: 1.2rem; font-weight: 700; text-shadow: 0 1px 2px rgba(0,0,0,0.1); }
-.brand-text small { font-size: 0.7rem; opacity: 0.9; background: rgba(0,0,0,0.2); padding: 2px 5px; border-radius: 4px; }
 
-/* 電腦版選單 (預設隱藏，大螢幕顯示) */
+/* 電腦版選單 */
 .nav-menu-desktop { display: none; gap: 10px; }
 .nav-btn {
     background: transparent; border: none; color: rgba(255,255,255,0.8);
-    cursor: pointer; font-size: 1rem; font-weight: 500; padding: 5px 10px;
-    transition: 0.2s;
+    cursor: pointer; font-size: 1rem; font-weight: 500; padding: 5px 10px; transition: 0.2s;
 }
 .nav-btn:hover, .nav-btn.active { color: #fff; background: rgba(255,255,255,0.2); border-radius: 20px; }
 
@@ -70,21 +49,13 @@ body {
 .app-content { padding: 20px; max-width: 800px; margin: 0 auto; }
 .section-title { color: var(--secondary-color); margin: 20px 0 10px 0; font-size: 1.2rem; display: flex; align-items: center; gap: 5px; }
 
-/* 4. 戰情英雄卡 (Hero Card) */
+/* 4. 英雄戰情卡 */
 .hero-card {
-    background: var(--primary-gradient);
-    border-radius: 20px;
-    padding: 25px;
-    color: white;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: 0 10px 20px rgba(255, 152, 0, 0.3);
-    margin-bottom: 25px;
-    position: relative;
-    overflow: hidden;
+    background: var(--primary-gradient); border-radius: 20px; padding: 25px;
+    color: white; display: flex; justify-content: space-between; align-items: center;
+    box-shadow: 0 10px 20px rgba(255, 152, 0, 0.3); margin-bottom: 25px;
+    position: relative; overflow: hidden;
 }
-/* 增加背景紋理 (蜂巢感) */
 .hero-card::before {
     content: ''; position: absolute; top: -50%; right: -10%; width: 200px; height: 200px;
     background: rgba(255,255,255,0.1); border-radius: 50%;
@@ -95,23 +66,15 @@ body {
 .stat-item { display: flex; flex-direction: column; }
 .stat-label { font-size: 0.8rem; opacity: 0.8; }
 .stat-value { font-size: 1.2rem; font-weight: bold; }
-
 .hero-weather { text-align: center; display: flex; flex-direction: column; align-items: center; }
 .weather-icon { font-size: 2.5rem; margin-bottom: 5px; }
 
-/* 5. 玻璃擬態卡片 (Glass Card) */
+/* 5. 玻璃擬態卡片 */
 .glass-card {
-    background: var(--glass-bg);
-    border: var(--glass-border);
-    border-radius: 16px;
-    padding: 20px;
-    box-shadow: var(--shadow);
-    margin-bottom: 15px;
-    backdrop-filter: blur(10px); /* 模糊特效 */
-    transition: transform 0.2s;
+    background: var(--glass-bg); border: var(--glass-border); border-radius: 16px;
+    padding: 20px; box-shadow: var(--shadow); margin-bottom: 15px;
+    backdrop-filter: blur(10px); transition: transform 0.2s;
 }
-.glass-card:active { transform: scale(0.98); } /* 點擊微縮效果 */
-
 .card-header { display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 15px; }
 .card-header h3 { margin: 0; color: var(--secondary-color); font-size: 1.1rem; }
 .card-header .material-icons-round { color: var(--primary-color); }
@@ -122,22 +85,17 @@ body {
 .menu-card .material-icons-round { font-size: 2rem; margin-bottom: 10px; display: block; }
 .menu-card h3 { margin: 0; font-size: 1rem; color: var(--text-main); }
 .menu-card p { margin: 5px 0 0 0; font-size: 0.8rem; color: var(--text-light); }
-
-/* 圖示顏色 */
-.icon-gold { color: #FF9800; }
-.icon-green { color: #4CAF50; }
-.icon-blue { color: #2196F3; }
-.icon-red { color: #E91E63; }
-
-/* 蜂王顏色球 */
+.icon-gold { color: #FF9800; } .icon-green { color: #4CAF50; } .icon-blue { color: #2196F3; } .icon-red { color: #E91E63; }
 .queen-color-dot { width: 30px; height: 30px; border-radius: 50%; margin: 0 auto; border: 2px solid #ddd; margin-top: 5px;}
 
-/* 7. 輸入元件優化 */
-.glass-input, .glass-textarea {
+/* 7. 輸入元件 */
+.glass-input, .glass-textarea, select {
     width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px;
     background: #f9f9f9; font-size: 1rem; margin-bottom: 10px; outline: none;
+    display: block; /* 確保換行 */
 }
 .glass-input:focus { border-color: var(--primary-color); background: #fff; }
+.input-row { display: flex; gap: 10px; } /* 讓輸入框並排 */
 
 .btn-primary {
     width: 100%; padding: 12px; border: none; border-radius: 10px;
@@ -147,7 +105,7 @@ body {
 .btn-secondary { width: 100%; padding: 10px; background: #607D8B; color: white; border: none; border-radius: 10px; margin-top: 10px; cursor: pointer; }
 .btn-danger { width: 100%; padding: 12px; background: #F44336; color: white; border: none; border-radius: 10px; cursor: pointer; }
 
-/* 結果顯示區 */
+/* 結果區 */
 .result-area { background: #fff3e0; padding: 15px; border-radius: 10px; margin-top: 15px; border-left: 4px solid #FF9800; }
 .result-area p { margin: 5px 0; color: #555; }
 .highlight { color: #D84315; font-weight: bold; font-size: 1.1rem; }
@@ -157,15 +115,12 @@ body {
 .task-item { display: flex; align-items: center; gap: 10px; font-size: 1.1rem; padding: 10px; background: #fff; border-radius: 8px; }
 .task-item input { width: 20px; height: 20px; }
 
-/* 8. 底部導覽列 (手機版) */
+/* 8. 底部導覽列 */
 .bottom-nav {
     position: fixed; bottom: 0; left: 0; width: 100%;
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    display: flex; justify-content: space-around;
-    padding: 10px 0 20px 0; /* 底部留白給 iPhone home bar */
-    box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
-    z-index: 1000;
+    background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px);
+    display: flex; justify-content: space-around; padding: 10px 0 20px 0;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.05); z-index: 1000;
     border-top: 1px solid rgba(0,0,0,0.05);
 }
 .nav-item {
@@ -179,10 +134,9 @@ body {
 /* 9. 顯示邏輯 */
 .tab-section { display: none; animation: fadeIn 0.3s ease; }
 .tab-section.active { display: block; }
-
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-/* RWD: 電腦版 */
+/* RWD */
 @media (min-width: 769px) {
     .bottom-nav { display: none; }
     .nav-menu-desktop { display: flex; }
