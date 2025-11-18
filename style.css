@@ -408,3 +408,147 @@ input, select, textarea {
 .result-box p { margin: 5px 0; }
 .check-row { display: flex; gap: 15px; margin: 10px 0; }
 .task-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+
+// ====================
+// 1. 頁面切換系統 (Tabs)
+// ====================
+function switchTab(tabId) {
+    // 隱藏所有頁面
+    document.querySelectorAll('.tab-section').forEach(section => {
+        section.classList.remove('active');
+    });
+    // 取消所有導覽按鈕的 active 狀態
+    document.querySelectorAll('.nav-item').forEach(nav => {
+        nav.classList.remove('active');
+    });
+
+    // 顯示目標頁面
+    document.getElementById(tabId).classList.add('active');
+    
+    // 點亮對應的導覽按鈕
+    // (這裡用簡單的邏輯：根據 tabId 找到對應按鈕，實際應用中可以更嚴謹)
+    const buttons = document.querySelectorAll('.nav-item');
+    if(tabId === 'tab-home') buttons[0].classList.add('active');
+    if(tabId === 'tab-calc') buttons[1].classList.add('active');
+    if(tabId === 'tab-logs') buttons[2].classList.add('active');
+    if(tabId === 'tab-tasks') buttons[3].classList.add('active');
+    
+    // 儲存當前分頁到 LocalStorage (重新整理後停在同一頁)
+    localStorage.setItem('bee_expert_active_tab', tabId);
+}
+
+// ====================
+// 2. 摺疊選單邏輯 (Accordion)
+// ====================
+function setupAccordion() {
+    const acc = document.getElementsByClassName("accordion");
+    for (let i = 0; i < acc.length; i++) {
+        acc[i].addEventListener("click", function() {
+            this.classList.toggle("active-accordion");
+            const panel = this.nextElementSibling;
+            if (panel.style.maxHeight) {
+                panel.style.maxHeight = null;
+            } else {
+                panel.style.maxHeight = panel.scrollHeight + "px";
+            }
+        });
+    }
+}
+
+// ====================
+// 3. 初始化與首頁資訊
+// ====================
+document.addEventListener('DOMContentLoaded', () => {
+    // A. 載入上次停留的分頁
+    const lastTab = localStorage.getItem('bee_expert_active_tab');
+    if (lastTab) {
+        switchTab(lastTab);
+    }
+
+    // B. 啟動摺疊選單
+    setupAccordion();
+
+    // C. 啟動自動儲存 (保留之前的功能)
+    setupAutoSave();
+
+    // D. 首頁日期顯示
+    const now = new Date();
+    document.getElementById('dashboardDate').innerText = 
+        `${now.getMonth()+1}月${now.getDate()}日`;
+    document.getElementById('dashboardYearInfo').innerText = 
+        `${now.getFullYear()} 年 • 辛勞了，蜂農朋友！`;
+
+    // E. 顯示今年蜂王顏色 (迷你版)
+    highlightHomeQueenColor();
+    
+    // F. 綁定所有計算按鈕 (為了節省篇幅，這裡簡化了事件綁定，請確認 HTML ID 正確)
+    bindAllCalculators();
+});
+
+// ====================
+// 4. 計算與功能邏輯 (精簡版整合)
+// ====================
+function bindAllCalculators() {
+    // 這裡要把原本各個計算按鈕的 addEventListener 搬過來
+    // 為了確保程式碼運作，我把原本核心的幾個功能寫在這裡
+    
+    // (一) 婚飛
+    const btnMating = document.getElementById('btnMatingPlanner');
+    if(btnMating) btnMating.addEventListener('click', () => {
+        // ... 放入原本的計算邏輯，或者呼叫舊函數 ...
+        // 這裡示範簡單寫法
+        const target = new Date(document.getElementById('targetMatingDate').value);
+        if(!isNaN(target)) {
+             const qDate = new Date(target); qDate.setDate(target.getDate() - 23);
+             document.getElementById('queenStartDate').innerText = qDate.toISOString().split('T')[0];
+             // ... 其他計算
+        }
+    });
+    
+    // ⚠️ 注意：您原本 script.js 裡面的詳細計算邏輯 (btnRearingBatch, btnSyrup 等)
+    // 請務必保留在您的 script.js 檔案中！
+    // 不要刪除您原本寫好的計算函數，只要確保 ID 對應即可。
+}
+
+// ====================
+// 5. 輔助功能
+// ====================
+function highlightHomeQueenColor() {
+    const year = new Date().getFullYear();
+    const digit = year % 10;
+    const colors = {0:'藍',1:'白',2:'黃',3:'紅',4:'綠',5:'藍',6:'白',7:'黃',8:'紅',9:'綠'};
+    const enColors = {0:'add8e6',1:'fff',2:'ffffe0',3:'f08080',4:'90ee90',5:'add8e6',6:'fff',7:'ffffe0',8:'f08080',9:'90ee90'};
+    
+    const colorName = colors[digit];
+    const colorHex = enColors[digit];
+    
+    const div = document.getElementById('home-queen-color');
+    if(div) {
+        div.innerHTML = `<div style="background:${colorHex}; padding:10px; border-radius:50%; width:50px; height:50px; display:flex; align-items:center; justify-content:center; margin:0 auto; border:2px solid #333; font-weight:bold;">${colorName}</div>`;
+    }
+}
+
+// 自動儲存 (保留您之前的代碼)
+function setupAutoSave() {
+    const inputs = document.querySelectorAll('input, select, textarea');
+    inputs.forEach(input => {
+        const saved = localStorage.getItem('bee_' + input.id);
+        if(saved && input.id) {
+             if(input.type==='checkbox') input.checked = (saved==='true');
+             else input.value = saved;
+        }
+        input.addEventListener('change', function(){
+            if(this.id) localStorage.setItem('bee_'+this.id, (this.type==='checkbox'?this.checked:this.value));
+        });
+    });
+}
+
+// 複製功能
+function copyToClipboard(id) {
+    const el = document.getElementById(id);
+    if(el) {
+        el.select();
+        navigator.clipboard.writeText(el.value).then(()=>alert('✅ 已複製！'));
+    }
+}
