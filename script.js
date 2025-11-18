@@ -2,81 +2,58 @@
 // 1. 核心導覽系統 (Tabs Navigation)
 // ==========================================
 function switchTab(tabId) {
-    // A. 處理內容顯示
-    // 隱藏所有分頁
-    document.querySelectorAll('.tab-section').forEach(section => {
+    console.log("切換分頁至:", tabId); // 除錯用
+
+    // A. 隱藏所有分頁內容
+    var sections = document.querySelectorAll('.tab-section');
+    sections.forEach(function(section) {
         section.classList.remove('active');
     });
-    // 顯示目標分頁
-    const targetSection = document.getElementById(tabId);
-    if(targetSection) targetSection.classList.add('active');
 
-    // B. 處理按鈕狀態 (同步更新電腦版和手機版)
-    // 移除所有按鈕的 active 樣式
-    document.querySelectorAll('.nav-item, .nav-item-desktop').forEach(btn => {
+    // B. 顯示目標分頁
+    var target = document.getElementById(tabId);
+    if (target) {
+        target.classList.add('active');
+    } else {
+        console.error("找不到分頁 ID:", tabId);
+        return;
+    }
+
+    // C. 更新按鈕狀態 (電腦版 + 手機版)
+    var allBtns = document.querySelectorAll('.nav-item, .nav-item-desktop');
+    allBtns.forEach(function(btn) {
         btn.classList.remove('active');
     });
 
-    // 找出對應的按鈕並點亮
-    // 手機版按鈕 (nav-item)
-    const mobileBtns = document.querySelectorAll('.nav-item');
-    const desktopBtns = document.querySelectorAll('.nav-item-desktop');
+    // 根據點擊的 tabId 點亮對應按鈕 (使用簡單的屬性選擇器)
+    // 尋找所有 onclick 包含該 tabId 的按鈕並加上 active
+    // 這種寫法比較粗暴但有效
+    var activeBtns = document.querySelectorAll('[onclick*="' + tabId + '"]');
+    activeBtns.forEach(function(btn) {
+        // 確保是導覽按鈕才加 active
+        if (btn.classList.contains('nav-item') || btn.classList.contains('nav-item-desktop')) {
+            btn.classList.add('active');
+        }
+    });
 
-    let index = 0;
-    if(tabId === 'tab-home') index = 0;
-    else if(tabId === 'tab-calc') index = 1;
-    else if(tabId === 'tab-logs') index = 2;
-    else if(tabId === 'tab-tasks') index = 3;
-    else if(tabId === 'tab-settings') index = 4;
-
-    if(mobileBtns[index]) mobileBtns[index].classList.add('active');
-    if(desktopBtns[index]) desktopBtns[index].classList.add('active');
-
-    // C. 儲存狀態
+    // D. 儲存狀態
     localStorage.setItem('bee_active_tab', tabId);
 }
 
 // ==========================================
-// 2. 介面互動與初始化
+// 2. 摺疊選單系統 (Accordion)
 // ==========================================
-document.addEventListener('DOMContentLoaded', () => {
-    // 1. 恢復上次停留的頁面
-    const savedTab = localStorage.getItem('bee_active_tab');
-    if (savedTab) {
-        switchTab(savedTab);
-    } else {
-        switchTab('tab-home'); // 預設首頁
-    }
-
-    // 2. 初始化摺疊選單
-    setupAccordion();
-
-    // 3. 初始化自動儲存
-    setupAutoSave();
-
-    // 4. 顯示日期與資訊
-    updateDashboardDate();
-
-    // 5. 顯示蜂王顏色
-    renderQueenColors();
-    
-    // 6. 綁定計算器按鈕事件
-    bindCalculators();
-});
-
-function updateDashboardDate() {
-    const now = new Date();
-    const dateStr = `${now.getMonth() + 1}月${now.getDate()}日`;
-    document.getElementById('dashboardDate').innerText = dateStr;
-    document.getElementById('dashboardYearInfo').innerText = `${now.getFullYear()} 年`;
-}
-
 function setupAccordion() {
-    const acc = document.getElementsByClassName("accordion");
-    for (let i = 0; i < acc.length; i++) {
-        acc[i].addEventListener("click", function() {
+    var acc = document.getElementsByClassName("accordion");
+    for (var i = 0; i < acc.length; i++) {
+        // 移除舊的事件監聽器 (防止重複綁定)
+        var newElement = acc[i].cloneNode(true);
+        acc[i].parentNode.replaceChild(newElement, acc[i]);
+        
+        // 綁定新事件
+        newElement.addEventListener("click", function() {
             this.classList.toggle("active-accordion");
-            const panel = this.nextElementSibling;
+            var panel = this.nextElementSibling;
             if (panel.style.maxHeight) {
                 panel.style.maxHeight = null;
             } else {
@@ -84,184 +61,254 @@ function setupAccordion() {
             }
         });
     }
+    // 重新抓取 acc 變數 (因為用了 replaceChild)
+    acc = document.getElementsByClassName("accordion");
 }
 
 // ==========================================
-// 3. 資料計算邏輯
+// 3. 初始化 (網頁載入後執行)
 // ==========================================
-function bindCalculators() {
+document.addEventListener('DOMContentLoaded', function() {
+    console.log("網站初始化開始...");
+
+    // 1. 恢復上次分頁
+    var savedTab = localStorage.getItem('bee_active_tab');
+    if (savedTab && document.getElementById(savedTab)) {
+        switchTab(savedTab);
+    } else {
+        switchTab('tab-home');
+    }
+
+    // 2. 初始化介面元件
+    setupAccordion();
+    updateDashboardDate();
+    renderQueenColors();
+    setupAutoSave(); // 啟動自動儲存
+
+    // 3. 綁定所有計算按鈕 (直接綁定，不依賴封裝函數)
+    bindAllButtons();
+});
+
+// ==========================================
+// 4. 按鈕綁定與計算邏輯 (直接寫法)
+// ==========================================
+function bindAllButtons() {
+    
+    // Helper: 安全綁定函數
+    function safeBind(id, handler) {
+        var btn = document.getElementById(id);
+        if (btn) {
+            btn.addEventListener('click', handler);
+        } else {
+            console.warn("警告：找不到按鈕 ID:", id);
+        }
+    }
+
     // (一) 婚飛反推
-    bindClick('btnMatingPlanner', () => {
-        const d = getDate('targetMatingDate');
+    safeBind('btnMatingPlanner', function() {
+        var d = getDate('targetMatingDate');
         if(d) {
             setText('queenStartDate', addDays(d, -23));
             setText('droneStartDate', addDays(d, -38));
-        }
+        } else { alert("請輸入日期！"); }
     });
 
     // (二) 育王排程
-    bindClick('btnRearingBatch', () => {
-        const d = getDate('graftingDate');
+    safeBind('btnRearingBatch', function() {
+        var d = getDate('graftingDate');
         if(d) {
             setText('graftDate', addDays(d, 0));
             setText('cappingDate', addDays(d, 5));
             setText('moveCellDate', addDays(d, 11));
             setText('emergenceDate', addDays(d, 13));
             setText('layingDate', addDays(d, 22));
-        }
+        } else { alert("請輸入移蟲日！"); }
     });
 
     // (三) 蜂蟹蟎
-    bindClick('btnVarroa', () => {
-        const d = getDate('cagingDate');
+    safeBind('btnVarroa', function() {
+        var d = getDate('cagingDate');
         if(d) {
             setText('workerEmergenceDate', addDays(d, 21));
-        }
+        } else { alert("請輸入關王日！"); }
     });
 
     // (四) 糖水計算
-    bindClick('btnSyrup', () => {
-        const ratio = document.getElementById('syrupRatio').value; // 1:1
-        const total = parseFloat(document.getElementById('totalVolume').value);
+    safeBind('btnSyrup', function() {
+        var ratio = document.getElementById('syrupRatio').value;
+        var total = parseFloat(document.getElementById('totalVolume').value);
         if(total) {
-            let sugar = 0, water = 0;
-            // 簡易估算: 1kg糖=0.6L, 水=1L
+            var sugar = 0, water = 0;
             if(ratio === '1:1') { 
-                // 1kg糖+1L水 = 1.6L體積
-                // x(1.6) = total => x = total/1.6
-                let units = total / 1.625;
-                sugar = units * 1; 
-                water = units * 1;
+                var units = total / 1.625; sugar = units; water = units;
             } else if (ratio === '2:1') {
-                // 2kg糖+1L水 = 2*0.625 + 1 = 2.25L
-                let units = total / 2.25;
-                sugar = units * 2;
-                water = units * 1;
+                var units = total / 2.25; sugar = units * 2; water = units;
+            } else {
+                 // 簡易處理其他比例
+                 sugar = total * 0.6; water = total * 0.6; 
             }
             setText('sugarKg', sugar.toFixed(1));
             setText('waterL', water.toFixed(1));
         }
     });
 
-    // (五) 利潤
-    bindClick('btnProfit', () => {
-        const boxes = parseFloat(getVal('harvestBoxes')) || 0;
-        const kgBox = parseFloat(getVal('avgKgPerBox')) || 0;
-        const price = parseFloat(getVal('pricePerKg')) || 0;
-        const cost = parseFloat(getVal('costPerBox')) || 0;
-
-        const totalRev = boxes * kgBox * price;
-        const totalCost = boxes * cost;
-        const net = totalRev - totalCost;
-        const perBox = boxes > 0 ? net / boxes : 0;
-
-        setText('netProfit', net.toLocaleString());
-        setText('profitPerBox', perBox.toLocaleString());
+    // 固體飼料
+    safeBind('btnSolidFeed', function() {
+        var total = parseFloat(document.getElementById('totalWeight').value);
+        if(total) {
+            // 簡單估算 5:1
+            var sugar = (total / 6) * 5;
+            var liquid = (total / 6) * 1;
+            setText('solidSugarKg', sugar.toFixed(1));
+            setText('solidWaterL', liquid.toFixed(1));
+        }
     });
 
-    // 設定清空按鈕
-    bindClick('btnClearLocalStorage', () => {
-        if(confirm('確定要清空所有紀錄嗎？這無法復原！')) {
+    // (五) 利潤
+    safeBind('btnProfit', function() {
+        var boxes = parseFloat(getVal('harvestBoxes')) || 0;
+        var kgBox = parseFloat(getVal('avgKgPerBox')) || 0;
+        var price = parseFloat(getVal('pricePerKg')) || 0;
+        var cost = parseFloat(getVal('costPerBox')) || 0;
+
+        var totalRev = boxes * kgBox * price;
+        var totalCost = boxes * cost;
+        var net = totalRev - totalCost;
+        var perBox = boxes > 0 ? net / boxes : 0;
+
+        setText('netProfit', Math.round(net).toLocaleString());
+        setText('profitPerBox', Math.round(perBox).toLocaleString());
+        setText('totalRevenue', Math.round(totalRev).toLocaleString());
+        setText('totalCost', Math.round(totalCost).toLocaleString());
+    });
+
+    // (九) 用藥紀錄生成
+    safeBind('btnLogMedication', function() {
+        var date = getVal('medicationDate');
+        var hives = getVal('medicationHives');
+        var name = getVal('medicationName');
+        var dose = getVal('medicationDosage');
+        var note = getVal('medicationNotes');
+        var log = `📅 日期: ${date}\n🐝 箱號: ${hives}\n💊 藥品: ${name}\n💉 劑量: ${dose}\n📝 備註: ${note}`;
+        document.getElementById('medicationLogOutput').value = log;
+    });
+
+    // (十一) 檢查紀錄生成
+    safeBind('btnLogInspection', function() {
+        var date = getVal('inspectionDate');
+        var hives = getVal('inspectionHives');
+        var frames = getVal('inspectionBroodFrames');
+        var notes = getVal('inspectionNotes');
+        // Checkbox 收集
+        var status = [];
+        if(document.getElementById('queenSeen').checked) status.push("見王");
+        if(document.getElementById('eggsSeen').checked) status.push("見卵");
+        if(document.getElementById('queenCell').checked) status.push("王台");
+        
+        var log = `📅 日期: ${date}\n🐝 箱號: ${hives}\n👀 狀態: ${status.join(', ')}\n🪧 脾數: ${frames}\n📝 備註: ${notes}`;
+        document.getElementById('inspectionLogOutput').value = log;
+    });
+
+    // 清空按鈕
+    safeBind('btnClearLocalStorage', function() {
+        if(confirm('⚠️ 確定要清空所有紀錄嗎？這無法復原！')) {
             localStorage.clear();
             alert('已清空，網頁將重新整理。');
             location.reload();
         }
     });
-}
-
-// 輔助函數
-function bindClick(id, func) {
-    const btn = document.getElementById(id);
-    if(btn) btn.addEventListener('click', func);
-}
-function getDate(id) {
-    const val = document.getElementById(id).value;
-    return val ? new Date(val) : null;
-}
-function getVal(id) { return document.getElementById(id).value; }
-function setText(id, text) { 
-    const el = document.getElementById(id);
-    if(el) el.innerText = text;
-}
-function addDays(date, days) {
-    const result = new Date(date);
-    result.setDate(result.getDate() + days);
-    return result.toISOString().split('T')[0];
-}
-
-// ==========================================
-// 4. 蜂王顏色渲染
-// ==========================================
-function renderQueenColors() {
-    const colors = [
-        {c:'#2196f3', n:'藍', y:'0, 5'}, // Blue
-        {c:'#ffffff', n:'白', y:'1, 6'}, // White
-        {c:'#ffeb3b', n:'黃', y:'2, 7'}, // Yellow
-        {c:'#f44336', n:'紅', y:'3, 8'}, // Red
-        {c:'#4caf50', n:'綠', y:'4, 9'}  // Green
-    ];
     
-    const currentYear = new Date().getFullYear();
-    const yearDigit = currentYear % 10; // 5
-
-    // 設定頁面的列表
-    const container = document.getElementById('settings-queen-color');
-    if(container) {
-        let html = '';
-        colors.forEach(c => {
-            const isCurrent = (yearDigit % 5 === colors.indexOf(c)); 
-            // 簡易判斷: 0,5是藍(idx0), 1,6是白(idx1)...
-            const style = isCurrent ? 'border:3px solid #000; transform:scale(1.1);' : 'border:1px solid #ddd;';
-            html += `<div style="background:${c.c}; width:60px; height:60px; display:flex; flex-direction:column; align-items:center; justify-content:center; border-radius:8px; ${style} color:#333; font-weight:bold; font-size:0.8em; box-shadow:0 2px 5px rgba(0,0,0,0.1);">
-                <span>${c.n}</span><span style="font-size:0.7em">${c.y}</span>
-            </div>`;
+    // 工作清單生成
+    safeBind('btnToDoList', function() {
+        var date = getVal('taskDate');
+        var hives = getVal('hiveNumbers');
+        var tasks = [];
+        var checkboxes = document.querySelectorAll('#tab-tasks input[type="checkbox"]');
+        checkboxes.forEach(function(cb) {
+            if(cb.checked) tasks.push(cb.value);
         });
-        container.innerHTML = html;
-    }
-
-    // 首頁的單一顯示
-    const homeContainer = document.getElementById('home-queen-color');
-    if(homeContainer) {
-        // 0->Blue(0), 1->White(1)... 5->Blue(0)
-        const idx = yearDigit < 5 ? yearDigit : yearDigit - 5;
-        const c = colors[idx];
-        homeContainer.innerHTML = `<div style="background:${c.c}; width:50px; height:50px; border-radius:50%; border:3px solid #333; margin:0 auto; display:flex; align-items:center; justify-content:center; font-weight:bold;">${c.n}</div>`;
-    }
+        var other = getVal('otherTask');
+        if(other) tasks.push(other);
+        
+        var log = `✅ 工作清單 [${date}]\n📦 箱號: ${hives}\n🔧 項目:\n- ${tasks.join('\n- ')}`;
+        document.getElementById('toDoListOutput').value = log;
+    });
 }
 
 // ==========================================
-// 5. 資料自動儲存 (Auto-Save)
+// 5. 輔助工具函數 (Utilities)
 // ==========================================
+function updateDashboardDate() {
+    var now = new Date();
+    var dateStr = (now.getMonth() + 1) + "月" + now.getDate() + "日";
+    var el = document.getElementById('dashboardDate');
+    if(el) el.innerText = dateStr;
+    
+    var elYear = document.getElementById('dashboardYearInfo');
+    if(elYear) elYear.innerText = now.getFullYear() + " 年";
+}
+
+function renderQueenColors() {
+    var year = new Date().getFullYear();
+    var digit = year % 10;
+    // 0,5藍 1,6白 2,7黃 3,8紅 4,9綠
+    var colors = ['藍','白','黃','紅','綠','藍','白','黃','紅','綠'];
+    var hexs = ['#2196f3','#ffffff','#ffeb3b','#f44336','#4caf50','#2196f3','#ffffff','#ffeb3b','#f44336','#4caf50'];
+    
+    var colorName = colors[digit];
+    var colorHex = hexs[digit];
+    
+    var div = document.getElementById('home-queen-color');
+    if(div) {
+        div.innerHTML = `<div style="background:${colorHex}; width:50px; height:50px; border-radius:50%; border:3px solid #333; margin:0 auto; display:flex; align-items:center; justify-content:center; font-weight:bold; color:#333; box-shadow:0 2px 5px rgba(0,0,0,0.2);">${colorName}</div>`;
+    }
+}
+
 function setupAutoSave() {
-    const inputs = document.querySelectorAll('input, select, textarea');
-    inputs.forEach(input => {
+    var inputs = document.querySelectorAll('input, select, textarea');
+    inputs.forEach(function(input) {
+        if(!input.id) return;
         // 讀取
-        if(input.id) {
-            const val = localStorage.getItem('bee_' + input.id);
-            if(val) {
-                if(input.type === 'checkbox') input.checked = (val === 'true');
-                else input.value = val;
-            }
+        var val = localStorage.getItem('bee_' + input.id);
+        if(val) {
+            if(input.type === 'checkbox') input.checked = (val === 'true');
+            else input.value = val;
         }
         // 儲存
         input.addEventListener('change', function() {
-            if(this.id) {
-                const v = (this.type === 'checkbox') ? this.checked : this.value;
-                localStorage.setItem('bee_' + this.id, v);
-            }
+            var v = (this.type === 'checkbox') ? this.checked : this.value;
+            localStorage.setItem('bee_' + this.id, v);
         });
     });
 }
 
-// 複製文字功能
-function copyToClipboard(elementId) {
-    const el = document.getElementById(elementId);
+function copyToClipboard(id) {
+    var el = document.getElementById(id);
     if(!el) return;
     el.select();
-    el.setSelectionRange(0, 99999);
-    navigator.clipboard.writeText(el.value).then(() => {
+    el.setSelectionRange(0, 99999); // 手機兼容
+    navigator.clipboard.writeText(el.value).then(function() {
         alert('✅ 已複製到剪貼簿');
-    }).catch(err => {
-        console.error('複製失敗', err);
+    }, function() {
+        alert('❌ 複製失敗，請手動複製');
     });
+}
+
+// 簡化版日期處理
+function getDate(id) {
+    var val = document.getElementById(id).value;
+    return val ? new Date(val) : null;
+}
+function getVal(id) {
+    var el = document.getElementById(id);
+    return el ? el.value : '';
+}
+function setText(id, txt) {
+    var el = document.getElementById(id);
+    if(el) el.innerText = txt;
+}
+function addDays(date, days) {
+    var result = new Date(date);
+    result.setDate(result.getDate() + days);
+    return result.toISOString().split('T')[0];
 }
