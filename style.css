@@ -262,3 +262,149 @@ button:hover { background-color: #004d40; }
     h1 { font-size: 1.8em; }
     h2 { font-size: 1.4em; margin-top: 30px; }
 }
+/* 全局設定 */
+body {
+    font-family: 'Noto Sans TC', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f7f6; /* 淺灰背景，不刺眼 */
+    padding-bottom: 80px; /* 為了避開底部導覽列 */
+    color: #333;
+}
+
+/* 頂部標題 */
+.app-header {
+    background: linear-gradient(135deg, #fbc02d, #f57f17);
+    color: white;
+    padding: 15px;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+.app-header h1 { margin: 0; font-size: 1.4em; }
+.app-header small { font-size: 0.6em; opacity: 0.8; }
+
+/* 分頁邏輯：預設隱藏，有 active 才顯示 */
+.tab-section { display: none; padding: 15px; animation: fadeIn 0.3s; }
+.tab-section.active { display: block; }
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* 卡片樣式 */
+.dashboard-card, .section-card, .menu-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+/* 首頁儀表板 */
+.dashboard-card { border-left: 5px solid #fbc02d; }
+.dashboard-card h2 { margin-top: 0; color: #333; }
+
+/* 首頁選單網格 */
+.menu-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+.menu-card { text-align: center; padding: 15px 5px; cursor: pointer; transition: transform 0.2s; }
+.menu-card:active { transform: scale(0.95); background: #fffde7; }
+.menu-card .icon { font-size: 2em; margin-bottom: 5px; }
+.menu-card h3 { margin: 5px 0; font-size: 1em; }
+.menu-card p { font-size: 0.8em; color: #888; margin: 0; }
+
+/* 底部導覽列 (核心) */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background: white;
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 0;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+    z-index: 1000;
+}
+.nav-item {
+    background: none;
+    border: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #999;
+    font-size: 0.8em;
+    cursor: pointer;
+}
+.nav-item.active { color: #f57f17; }
+.nav-icon { font-size: 1.5em; margin-bottom: 2px; }
+
+/* 摺疊選單 (Accordion) */
+.accordion {
+    background-color: white;
+    color: #444;
+    cursor: pointer;
+    padding: 18px;
+    width: 100%;
+    border: none;
+    text-align: left;
+    outline: none;
+    font-size: 1.1em;
+    transition: 0.4s;
+    border-bottom: 1px solid #eee;
+    border-radius: 8px;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+.active-accordion, .accordion:hover { background-color: #fff8e1; }
+.accordion:after { content: '\002B'; float: right; font-weight: bold; }
+.active-accordion:after { content: "\2212"; }
+.panel {
+    padding: 0 18px;
+    background-color: white;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.2s ease-out;
+    margin-bottom: 10px;
+    border-radius: 0 0 8px 8px;
+}
+
+/* 輸入框與按鈕美化 */
+input, select, textarea {
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0;
+    box-sizing: border-box;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 16px; /* 防止 iOS 放大 */
+}
+.btn-action {
+    width: 100%;
+    background-color: #f57f17;
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 6px;
+    font-size: 1.1em;
+    cursor: pointer;
+    margin-top: 10px;
+}
+.btn-copy {
+    width: 100%;
+    background-color: #546e7a;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 6px;
+    margin-top: 5px;
+}
+.result-box {
+    background: #f9f9f9;
+    padding: 15px;
+    border-radius: 6px;
+    margin-top: 10px;
+    border-left: 4px solid #ccc;
+}
+.result-box p { margin: 5px 0; }
+.check-row { display: flex; gap: 15px; margin: 10px 0; }
+.task-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
