@@ -226,3 +226,39 @@ button:hover { background-color: #004d40; }
         margin-bottom: 10px;
     }
 }
+
+/* =========================================
+   手機版專用優化 (RWD)
+   將這段貼在 style.css 的最下面
+   ========================================= */
+@media (max-width: 600px) {
+    /* 1. 讓所有輸入框填滿寬度，不要擠在一起 */
+    input[type="text"], 
+    input[type="number"], 
+    input[type="date"], 
+    select,
+    textarea {
+        width: 100% !important; /* 強制填滿手機螢幕寬度 */
+        box-sizing: border-box; /* 包含內邊距 */
+        margin-bottom: 10px; /* 增加垂直間距 */
+        font-size: 16px; /* 防止 iPhone 自動縮放 */
+    }
+
+    /* 2. 讓紀錄區塊 (Grid) 變成單欄垂直排列 */
+    .log-grid {
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* 3. 按鈕變大，方便手指點擊 */
+    button {
+        width: 100%;
+        padding: 12px;
+        font-size: 1.1em;
+        margin-top: 10px;
+    }
+
+    /* 4. 調整標題大小 */
+    h1 { font-size: 1.8em; }
+    h2 { font-size: 1.4em; margin-top: 30px; }
+}
