@@ -163,3 +163,66 @@ button:hover { background-color: #004d40; }
 }
 
 /* refresh */
+
+/* ====================
+   新增樣式：複製按鈕
+   ==================== */
+.btn-copy {
+    background-color: #607d8b; /* 藍灰色，與計算按鈕區隔 */
+    color: white;
+    padding: 8px 15px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px; /* 圖示與文字的距離 */
+    transition: background-color 0.3s;
+}
+
+.btn-copy:hover {
+    background-color: #455a64;
+}
+
+.btn-copy:active {
+    transform: scale(0.98);
+}
+
+/* ====================
+   新增樣式：蜂王顏色優化
+   ==================== */
+.color-guide {
+    display: flex;
+    justify-content: space-around; /* 平均分散 */
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.color-swatch {
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+    width: 80px;
+    font-weight: bold;
+    border: 1px solid #ddd;
+    position: relative;
+    transition: all 0.3s;
+}
+
+/* 當年份選中時的特效 */
+.current-year-color {
+    border: 4px solid #d32f2f !important; /* 粗紅框 */
+    transform: scale(1.15); /* 放大 1.15 倍 */
+    box-shadow: 0 0 15px rgba(0,0,0,0.3); /* 陰影 */
+    z-index: 10; /* 浮在最上層 */
+}
+
+/* 手機版適應 */
+@media (max-width: 600px) {
+    .color-swatch {
+        width: 45%; /* 手機版一行兩個 */
+        margin-bottom: 10px;
+    }
+}
