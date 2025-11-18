@@ -1,187 +1,214 @@
 // ==========================================
-// 蜂場專家 V3.5 - 核心邏輯 (Verified Code)
+// 蜂場專家 V3.6 - 完整功能版
 // ==========================================
 
 document.addEventListener('DOMContentLoaded', function() {
     console.log("蜂場專家系統啟動...");
     
-    // 1. 載入上次停留的分頁
+    // 1. 載入分頁
     var savedTab = localStorage.getItem('bee_active_tab') || 'tab-home';
     switchTab(savedTab);
     
-    // 2. 更新首頁資訊
+    // 2. 初始化首頁
     updateHeroInfo();
-    
-    // 3. 綁定按鈕事件 (核心功能)
-    bindAllEvents();
-    
-    // 4. 渲染蜂王顏色
     renderQueenColor();
+    
+    // 3. 綁定所有按鈕 (包含原本遺失的功能)
+    bindAllEvents();
 });
 
-// --- 1. 分頁切換系統 ---
+// --- 分頁切換 ---
 function switchTab(tabId) {
-    // 隱藏所有頁面
-    document.querySelectorAll('.tab-section').forEach(function(el) {
-        el.classList.remove('active');
-    });
-    
-    // 顯示目標頁面
+    document.querySelectorAll('.tab-section').forEach(function(el) { el.classList.remove('active'); });
     var target = document.getElementById(tabId);
-    if (target) {
-        target.classList.add('active');
-    }
+    if (target) target.classList.add('active');
     
-    // 更新底部導覽列狀態
-    document.querySelectorAll('.nav-item').forEach(function(btn) {
-        btn.classList.remove('active');
-    });
-    
-    // 簡單透過 onclick 屬性來匹配按鈕
+    document.querySelectorAll('.nav-item').forEach(function(btn) { btn.classList.remove('active'); });
     var activeBtns = document.querySelectorAll('[onclick*="' + tabId + '"]');
-    activeBtns.forEach(function(btn) {
-        btn.classList.add('active');
-    });
+    activeBtns.forEach(function(btn) { btn.classList.add('active'); });
     
-    // 儲存狀態
     localStorage.setItem('bee_active_tab', tabId);
 }
 
-// --- 2. 更新首頁資訊 ---
+// --- 首頁資訊更新 ---
 function updateHeroInfo() {
-    // 日期
     var now = new Date();
     var dateStr = (now.getMonth() + 1) + "月" + now.getDate() + "日";
     var elDate = document.getElementById('heroDate');
     if(elDate) elDate.innerText = now.getFullYear() + "年 " + dateStr;
     
-    // 模擬天氣 (實際上可串接 API，這裡先寫死示範)
-    // 若要真實天氣，需 HTTPS 環境與 API Key
+    // 模擬天氣
     document.getElementById('heroWeatherDesc').innerText = "晴時多雲";
     document.getElementById('heroTemp').innerText = "26°C";
     
-    // 讀取待辦事項數量 (模擬)
-    var tasks = localStorage.getItem('bee_task_count') || '0';
-    document.getElementById('heroTaskCount').innerText = tasks + " 項";
+    // 產量與待辦
+    var yieldVal = localStorage.getItem('bee_hero_yield') || '0';
+    var taskCount = localStorage.getItem('bee_task_count') || '0';
+    document.getElementById('heroYield').innerText = yieldVal + " kg";
+    document.getElementById('heroTaskCount').innerText = taskCount + " 項";
 }
 
-// --- 3. 蜂王顏色邏輯 ---
+// --- 蜂王顏色 ---
 function renderQueenColor() {
-    var year = new Date().getFullYear();
-    var digit = year % 10; // 取尾數
-    // 0,5藍 | 1,6白 | 2,7黃 | 3,8紅 | 4,9綠
+    var y = new Date().getFullYear() % 10;
     var colors = ['#2196F3', '#FFFFFF', '#FFEB3B', '#F44336', '#4CAF50', '#2196F3', '#FFFFFF', '#FFEB3B', '#F44336', '#4CAF50'];
     var box = document.getElementById('queenColorBox');
-    if(box) {
-        box.style.backgroundColor = colors[digit];
-        box.title = "年份尾數: " + digit;
-    }
+    if(box) { box.style.backgroundColor = colors[y]; box.title = "年份尾數: " + y; }
 }
 
-// --- 4. 按鈕綁定與功能實作 (防呆版) ---
+// --- 按鈕綁定與邏輯 (核心) ---
 function bindAllEvents() {
-    
-    // Helper: 安全綁定
     function safeBind(id, handler) {
         var btn = document.getElementById(id);
-        if (btn) {
-            btn.addEventListener('click', handler);
-        } else {
-            console.warn('按鈕未找到 (可能 HTML ID 不匹配): ' + id);
-        }
+        if (btn) btn.addEventListener('click', handler);
     }
-
-    // === 計算工具：婚飛 ===
+    
+    // 1. 婚飛
     safeBind('btnCalcMating', function() {
-        var inputDate = document.getElementById('inputMatingDate').value;
-        if (!inputDate) { alert("請選擇日期！"); return; }
-        
-        var target = new Date(inputDate);
-        var queenDate = new Date(target); queenDate.setDate(target.getDate() - 23);
-        var droneDate = new Date(target); droneDate.setDate(target.getDate() - 38);
-        
-        document.getElementById('resQueenDate').innerText = queenDate.toISOString().split('T')[0];
-        document.getElementById('resDroneDate').innerText = droneDate.toISOString().split('T')[0];
+        var d = getDate('inputMatingDate');
+        if(d) {
+            setText('resQueenDate', addDays(d, -23));
+            setText('resDroneDate', addDays(d, -38));
+        } else alert("請輸入日期");
     });
 
-    // === 計算工具：糖水 ===
+    // 2. 育王排程
+    safeBind('btnRearingBatch', function() {
+        var d = getDate('graftingDate');
+        if(d) {
+            setText('graftDate', addDays(d, 0));
+            setText('cappingDate', addDays(d, 5));
+            setText('moveCellDate', addDays(d, 11));
+            setText('emergenceDate', addDays(d, 13));
+        } else alert("請輸入移蟲日");
+    });
+
+    // 3. 蜂蟹蟎
+    safeBind('btnVarroa', function() {
+        var d = getDate('cagingDate');
+        if(d) { setText('workerEmergenceDate', addDays(d, 21)); } else alert("請輸入關王日");
+    });
+
+    // 4. 分蜂
+    safeBind('btnSwarm', function() {
+        var d = getDate('targetSwarmDate');
+        if(d) { setText('graftForCellDate', addDays(d, -12)); } else alert("請輸入預計分蜂日");
+    });
+
+    // 5. 流蜜期
+    safeBind('btnHoneyFlow', function() {
+        var d = getDate('honeyFlowDate');
+        if(d) {
+            setText('startFeedingDate', addDays(d, -28));
+            setText('removeMedsDate', addDays(d, -14));
+        } else alert("請輸入流蜜日");
+    });
+
+    // 6. 糖水
     safeBind('btnCalcSyrup', function() {
-        var ratio = document.getElementById('inputSyrupRatio').value;
-        var vol = parseFloat(document.getElementById('inputSyrupVol').value);
-        
-        if (!vol) { alert("請輸入公升數！"); return; }
-        
-        var sugar = 0, water = 0;
-        // 簡易體積估算 (1kg糖 溶解後約 0.6L)
-        if (ratio === '1:1') {
-            // 1kg糖 + 1kg水 = 1.6L
-            var unit = vol / 1.6;
-            sugar = unit; water = unit;
-        } else {
-            // 2kg糖 + 1kg水 = 2.2L
-            var unit = vol / 2.2;
-            sugar = unit * 2; water = unit;
+        var r = document.getElementById('inputSyrupRatio').value;
+        var v = parseFloat(getVal('inputSyrupVol'));
+        if(v) {
+            var s = 0, w = 0;
+            if(r === '1:1') { s = v/1.6; w = v/1.6; } else { s = v/2.2 * 2; w = v/2.2; }
+            setText('resSugar', s.toFixed(1));
+            setText('resWater', w.toFixed(1));
         }
-        
-        document.getElementById('resSugar').innerText = sugar.toFixed(1);
-        document.getElementById('resWater').innerText = water.toFixed(1);
     });
 
-    // === 日誌紀錄：儲存 ===
-    safeBind('btnSaveLog', function() {
-        var date = document.getElementById('logDate').value;
-        var hive = document.getElementById('logHive').value;
-        var drug = document.getElementById('logDrug').value;
-        var note = document.getElementById('logNote').value;
+    // 8. 利潤
+    safeBind('btnProfit', function() {
+        var box = parseFloat(getVal('harvestBoxes')) || 0;
+        var kg = parseFloat(getVal('avgKgPerBox')) || 0;
+        var p = parseFloat(getVal('pricePerKg')) || 0;
+        var c = parseFloat(getVal('costPerBox')) || 0;
         
-        if(!date || !hive) { alert("請填寫日期與箱號"); return; }
+        var rev = box * kg * p;
+        var cost = box * c;
+        var net = rev - cost;
         
-        var logLine = `📅 ${date} | 箱號: ${hive} | 💊 ${drug} | 備註: ${note}\n`;
-        var textarea = document.getElementById('outputLog');
-        textarea.value += logLine;
+        setText('totalRevenue', rev.toLocaleString());
+        setText('totalCost', cost.toLocaleString());
+        setText('netProfit', net.toLocaleString());
         
-        // 存到 localStorage
-        localStorage.setItem('bee_med_log', textarea.value);
-        alert("紀錄已儲存！");
+        // 儲存產量供首頁顯示
+        var totalKg = box * kg;
+        localStorage.setItem('bee_hero_yield', totalKg);
+        document.getElementById('heroYield').innerText = totalKg + " kg";
+        
+        // 畫圖
+        if(typeof Chart !== 'undefined') {
+            var ctx = document.getElementById('profitChart');
+            if(window.myChart) window.myChart.destroy();
+            window.myChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: { labels: ['成本', '利潤'], datasets: [{ data: [cost, net], backgroundColor: ['#FF5722', '#4CAF50'] }] }
+            });
+        }
     });
 
-    // === 日誌紀錄：複製 ===
-    safeBind('btnCopyLog', function() {
-        var textarea = document.getElementById('outputLog');
-        textarea.select();
-        document.execCommand('copy'); // 舊版相容寫法
-        alert("✅ 已複製到剪貼簿");
+    // 日誌紀錄 (共用邏輯)
+    safeBind('btnSaveLog', function() { appendLog('outputLog', `📅 ${getVal('logDate')} | 箱:${getVal('logHive')} | 藥:${getVal('logDrug')} | 備:${getVal('logNote')}`); });
+    safeBind('btnSaveIns', function() {
+        var cks = [];
+        if(document.getElementById('ckQueen').checked) cks.push("見王");
+        if(document.getElementById('ckEggs').checked) cks.push("見卵");
+        if(document.getElementById('ckCell').checked) cks.push("王台");
+        appendLog('outputIns', `📅 ${getVal('insDate')} | 箱:${getVal('insHive')} | ${cks.join(',')} | 備:${getVal('insNote')}`);
+    });
+    safeBind('btnSaveQueen', function() { appendLog('outputQueen', `👑 ${getVal('queenId')} | 出台:${getVal('queenHatch')} | 狀態:${document.getElementById('queenStatus').value}`); });
+    safeBind('btnSaveMove', function() { appendLog('outputMove', `🚚 ${getVal('moveDate')} | 從 ${getVal('moveFrom')} 到 ${getVal('moveTo')}`); });
+    safeBind('btnSaveHarv', function() { appendLog('outputHarv', `🍯 ${getVal('harvDate')} | ${getVal('harvItem')} | ${getVal('harvKg')}kg`); });
+    safeBind('btnSaveExp', function() { appendLog('outputExp', `💸 ${getVal('expItem')} | $${getVal('expCost')}`); });
+
+    // 工作清單
+    safeBind('btnGenTask', function() {
+        var t = [];
+        document.querySelectorAll('.task-list input:checked').forEach(function(c){ t.push(c.value); });
+        var o = getVal('taskOther'); if(o) t.push(o);
+        document.getElementById('outputTask').value = "✅ 待辦事項：\n" + t.join('\n');
+        localStorage.setItem('bee_task_count', t.length);
+        document.getElementById('heroTaskCount').innerText = t.length + " 項";
+    });
+
+    // 備份
+    safeBind('btnExport', function() {
+        var data = JSON.stringify(localStorage);
+        var blob = new Blob([data], {type: "application/json"});
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url; a.download = "bee_backup.json";
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
     });
     
-    // 頁面載入時，恢復日誌內容
-    var savedLog = localStorage.getItem('bee_med_log');
-    if(savedLog) document.getElementById('outputLog').value = savedLog;
+    // 匯入
+    var fileInput = document.getElementById('fileInput');
+    if(fileInput) {
+        fileInput.addEventListener('change', function(e) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                var d = JSON.parse(e.target.result);
+                Object.keys(d).forEach(function(k){ localStorage.setItem(k, d[k]); });
+                alert("還原成功！"); location.reload();
+            };
+            reader.readAsText(e.target.files[0]);
+        });
+    }
+    
+    // 清空
+    safeBind('btnClearAll', function() { if(confirm("確定清空？")) { localStorage.clear(); location.reload(); } });
+}
 
-    // === 工作清單：生成 ===
-    safeBind('btnGenTask', function() {
-        var tasks = [];
-        // 抓取所有打勾的 checkbox
-        var checks = document.querySelectorAll('.task-list input[type="checkbox"]:checked');
-        checks.forEach(function(c) { tasks.push(c.value); });
-        
-        var other = document.getElementById('taskOther').value;
-        if(other) tasks.push(other);
-        
-        var result = "✅ 今日工作清單：\n";
-        tasks.forEach(function(t) { result += "- " + t + "\n"; });
-        
-        document.getElementById('outputTask').value = result;
-        
-        // 更新首頁待辦數字
-        localStorage.setItem('bee_task_count', tasks.length);
-        document.getElementById('heroTaskCount').innerText = tasks.length + " 項";
-    });
-
-    // === 設定：清空 ===
-    safeBind('btnClearAll', function() {
-        if(confirm("⚠️ 確定要清空所有紀錄嗎？此操作無法復原！")) {
-            localStorage.clear();
-            location.reload();
-        }
-    });
+// --- 工具函數 ---
+function getDate(id) { var v = document.getElementById(id).value; return v ? new Date(v) : null; }
+function getVal(id) { var e = document.getElementById(id); return e ? e.value : ''; }
+function setText(id, t) { var e = document.getElementById(id); if(e) e.innerText = t; }
+function addDays(d, n) { var x = new Date(d); x.setDate(x.getDate()+n); return x.toISOString().split('T')[0]; }
+function appendLog(id, txt) {
+    var area = document.getElementById(id);
+    if(area) { area.value += txt + '\n'; localStorage.setItem('bee_saved_'+id, area.value); }
+}
+function copyToClipboard(id) {
+    var el = document.getElementById(id);
+    el.select(); document.execCommand('copy'); alert("已複製");
 }
