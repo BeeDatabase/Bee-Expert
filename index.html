@@ -3,30 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Bee Expert Pro</title>
+    <title>蜂場專家 - 專業版</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
     <nav class="top-nav">
         <div class="nav-brand">
-            <span class="material-icons">hive</span> 
-            <span id="navAppName">Bee Expert</span> <small>Pro</small>
+            <div class="brand-icon"><span class="material-icons-round">hive</span></div>
+            <div class="brand-text">
+                <h1>蜂場專家</h1>
+                <small>專業版 V3.5</small>
+            </div>
         </div>
-        <div class="nav-controls">
-            <button id="btnThemeToggle" class="icon-btn" title="切換深色模式">
-                <span class="material-icons">dark_mode</span>
-            </button>
-        </div>
-        <div class="nav-links">
-            <button class="nav-item-desktop active" onclick="switchTab('tab-home')">儀表板</button>
-            <button class="nav-item-desktop" onclick="switchTab('tab-calc')">計算</button>
-            <button class="nav-item-desktop" onclick="switchTab('tab-logs')">日誌</button>
-            <button class="nav-item-desktop" onclick="switchTab('tab-tasks')">工作</button>
-            <button class="nav-item-desktop" onclick="switchTab('tab-settings')">設定</button>
+        
+        <div class="nav-menu-desktop">
+            <button class="nav-btn active" onclick="switchTab('tab-home')">戰情總覽</button>
+            <button class="nav-btn" onclick="switchTab('tab-calc')">計算工具</button>
+            <button class="nav-btn" onclick="switchTab('tab-logs')">日誌紀錄</button>
+            <button class="nav-btn" onclick="switchTab('tab-tasks')">工作清單</button>
+            <button class="nav-btn" onclick="switchTab('tab-settings')">系統設定</button>
         </div>
     </nav>
 
@@ -34,179 +32,163 @@
 
         <div id="tab-home" class="tab-section active">
             
-            <div class="farm-header-banner">
-                <div class="farm-info">
-                    <h1 id="myFarmName" contenteditable="true" class="editable-title">我的專業蜂場</h1>
-                    <p class="edit-hint">(點擊文字可修改名稱)</p>
+            <div class="hero-card">
+                <div class="hero-content">
+                    <p class="hero-date" id="heroDate">載入中...</p>
+                    <h2 class="hero-title">今日蜂場概況</h2>
+                    <div class="hero-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">預估產量</span>
+                            <span class="stat-value" id="heroYield">0 <small>kg</small></span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">待辦事項</span>
+                            <span class="stat-value" id="heroTaskCount">0 <small>項</small></span>
+                        </div>
+                    </div>
                 </div>
-                <div class="weather-badge">
-                    <span class="material-icons">thermostat</span>
-                    <span id="liveTemp">--°C</span>
-                    <span id="liveWeather">載入中...</span>
+                <div class="hero-weather">
+                    <span class="material-icons-round weather-icon">wb_sunny</span>
+                    <span id="heroTemp">24°C</span>
+                    <span id="heroWeatherDesc">晴朗</span>
                 </div>
             </div>
 
-            <div class="dashboard-grid">
-                <div class="dashboard-card primary-card">
-                    <span class="card-icon">📅</span>
-                    <h2 id="dashboardDate">---</h2>
-                    <p id="dashboardYearInfo">---</p>
+            <div class="grid-menu">
+                <div class="glass-card menu-card" onclick="switchTab('tab-calc')">
+                    <span class="material-icons-round icon-gold">calculate</span>
+                    <h3>計算工具</h3>
+                    <p>婚飛、飼料、利潤</p>
                 </div>
-                
-                <div class="dashboard-card">
-                    <span class="material-icons card-icon" style="color: #e91e63;">verified</span>
-                    <h3>今年蜂王顏色</h3>
-                    <div id="home-queen-color" class="color-guide-mini"></div>
-                    <p class="small-text">國際標準標記色</p>
+                <div class="glass-card menu-card" onclick="switchTab('tab-logs')">
+                    <span class="material-icons-round icon-green">edit_note</span>
+                    <h3>日誌紀錄</h3>
+                    <p>巡場、用藥、採收</p>
                 </div>
-
-                <div class="dashboard-card action-card" onclick="switchTab('tab-tasks')">
-                    <span class="material-icons card-icon" style="color: #4caf50;">checklist</span>
-                    <h3>今日工作</h3>
-                    <p>查看待辦清單</p>
+                <div class="glass-card menu-card" onclick="switchTab('tab-tasks')">
+                    <span class="material-icons-round icon-blue">checklist</span>
+                    <h3>工作清單</h3>
+                    <p>今日任務打勾</p>
+                </div>
+                <div class="glass-card menu-card">
+                    <span class="material-icons-round icon-red">verified</span>
+                    <h3>今年蜂王色</h3>
+                    <div id="queenColorBox" class="queen-color-dot"></div>
                 </div>
             </div>
         </div>
 
         <div id="tab-calc" class="tab-section">
-            <div class="section-header"><h2>🧮 計算工具</h2></div>
-            <div class="tool-selector">
-                <button class="accordion">📅 婚飛 / 育王反推</button>
-                <div class="panel">
-                    <label>目標交尾日期：</label><input type="date" id="targetMatingDate">
-                    <button id="btnMatingPlanner" class="btn-action">計算</button>
-                    <div class="result-box"><p>移蟲日：<b id="queenStartDate">---</b></p></div>
+            <h2 class="section-title">🧮 精密計算工具</h2>
+            
+            <div class="glass-card tool-card">
+                <div class="card-header">
+                    <span class="material-icons-round">event</span>
+                    <h3>婚飛 / 育王反推</h3>
                 </div>
-                <button class="accordion">🐛 育王批次排程</button>
-                <div class="panel">
-                    <label>移蟲日：</label><input type="date" id="graftingDate">
-                    <button id="btnRearingBatch" class="btn-action">計算</button>
-                    <div class="result-box list-view">
-                        <p>0. 移蟲：<b id="graftDate">---</b></p>
-                        <p>11. 移台：<b id="moveCellDate" class="highlight">---</b></p>
-                        <p>13. 出台：<b id="emergenceDate">---</b></p>
+                <div class="card-body">
+                    <label>目標交尾日期：</label>
+                    <input type="date" id="inputMatingDate" class="glass-input">
+                    <button id="btnCalcMating" class="btn-primary">開始計算</button>
+                    <div class="result-area">
+                        <p>移蟲日 (最遲)：<b id="resQueenDate" class="highlight">---</b></p>
+                        <p>雄蜂培育日：<b id="resDroneDate">---</b></p>
                     </div>
                 </div>
-                <button class="accordion">🦠 蜂蟹蟎治療期</button>
-                <div class="panel">
-                    <label>關王日：</label><input type="date" id="cagingDate">
-                    <button id="btnVarroa" class="btn-action">計算</button>
-                    <div class="result-box"><p>建議用藥：<b id="workerEmergenceDate">---</b> 後</p></div>
+            </div>
+
+            <div class="glass-card tool-card">
+                <div class="card-header">
+                    <span class="material-icons-round">local_cafe</span>
+                    <h3>糖水比例計算</h3>
                 </div>
-                <button class="accordion">🍯 糖水/飼料比例</button>
-                <div class="panel">
-                    <select id="syrupRatio"><option value="1:1">1:1 (獎勵)</option><option value="2:1">2:1 (越冬)</option></select>
-                    <input type="number" id="totalVolume" placeholder="公升數 (L)">
-                    <button id="btnSyrup" class="btn-action">計算</button>
-                    <div class="result-box"><p>糖：<b id="sugarKg">---</b> kg | 水：<b id="waterL">---</b> L</p></div>
-                </div>
-                <button class="accordion">💰 利潤計算機 & 圖表</button>
-                <div class="panel">
-                    <input type="number" id="harvestBoxes" placeholder="箱數">
-                    <input type="number" id="avgKgPerBox" placeholder="均產 (kg)">
-                    <input type="number" id="pricePerKg" placeholder="售價">
-                    <input type="number" id="costPerBox" placeholder="成本">
-                    <button id="btnProfit" class="btn-action">計算</button>
-                    <div class="result-box">
-                        <p>淨利：<b id="netProfit" class="highlight">---</b> 元</p>
+                <div class="card-body">
+                    <div class="input-row">
+                        <select id="inputSyrupRatio" class="glass-input">
+                            <option value="1:1">1:1 (獎勵)</option>
+                            <option value="2:1">2:1 (越冬)</option>
+                        </select>
+                        <input type="number" id="inputSyrupVol" class="glass-input" placeholder="公升數 (L)">
                     </div>
-                    <div style="height:200px; margin-top:15px;"><canvas id="profitChart"></canvas></div>
+                    <button id="btnCalcSyrup" class="btn-primary">計算配方</button>
+                    <div class="result-area">
+                        <p>白糖：<b id="resSugar" class="highlight">---</b> kg</p>
+                        <p>清水：<b id="resWater">---</b> L</p>
+                    </div>
                 </div>
             </div>
         </div>
 
         <div id="tab-logs" class="tab-section">
-            <div class="section-header">
-                <h2>📝 日誌紀錄</h2>
-                <button id="btnExportCSV" class="btn-small" style="background:#27ae60; color:white;">📥 匯出 Excel</button>
-            </div>
+            <h2 class="section-title">📝 蜂場日誌</h2>
 
-            <div class="tool-selector">
-                <button class="accordion">🏥 用藥紀錄</button>
-                <div class="panel">
-                    <input type="date" id="medicationDate">
-                    <input type="text" id="medicationHives" placeholder="蜂箱編號">
-                    <input type="text" id="medicationName" placeholder="藥名">
-                    <div class="input-group-voice">
-                        <input type="text" id="medicationNotes" placeholder="備註 (可語音輸入)">
-                        <button class="btn-voice" onclick="startVoice('medicationNotes')">🎤</button>
-                    </div>
-                    <button id="btnLogMedication" class="btn-action">紀錄</button>
-                    <textarea id="medicationLogOutput" rows="3"></textarea>
-                    <button class="btn-copy" onclick="copyToClipboard('medicationLogOutput')">📋 複製</button>
+            <div class="glass-card tool-card">
+                <div class="card-header">
+                    <span class="material-icons-round">healing</span>
+                    <h3>用藥紀錄</h3>
                 </div>
-
-                <button class="accordion">🔎 巡場檢查</button>
-                <div class="panel">
-                    <input type="date" id="inspectionDate">
-                    <input type="text" id="inspectionHives" placeholder="蜂箱編號">
-                    <div class="check-row">
-                        <label><input type="checkbox" id="queenSeen">見王</label>
-                        <label><input type="checkbox" id="queenCell">王台</label>
-                    </div>
-                    <div class="input-group-voice">
-                        <input type="text" id="inspectionNotes" placeholder="檢查備註 (可語音)">
-                        <button class="btn-voice" onclick="startVoice('inspectionNotes')">🎤</button>
-                    </div>
-                    <button id="btnLogInspection" class="btn-action">紀錄</button>
-                    <textarea id="inspectionLogOutput" rows="3"></textarea>
-                    <button class="btn-copy" onclick="copyToClipboard('inspectionLogOutput')">📋 複製</button>
+                <div class="card-body">
+                    <input type="date" id="logDate" class="glass-input">
+                    <input type="text" id="logHive" class="glass-input" placeholder="箱號 (如 A-01)">
+                    <input type="text" id="logDrug" class="glass-input" placeholder="藥名 (如 草酸)">
+                    <input type="text" id="logNote" class="glass-input" placeholder="備註">
+                    
+                    <button id="btnSaveLog" class="btn-primary">寫入紀錄</button>
+                    
+                    <textarea id="outputLog" class="glass-textarea" rows="5" placeholder="紀錄將顯示於此..."></textarea>
+                    <button id="btnCopyLog" class="btn-secondary">📋 複製紀錄</button>
                 </div>
             </div>
         </div>
 
         <div id="tab-tasks" class="tab-section">
-            <div class="section-header"><h2>✅ 工作清單</h2></div>
-            <div class="section-card">
-                <label>日期：</label><input type="date" id="taskDate">
-                <label>箱號：</label><input type="text" id="hiveNumbers" placeholder="1-10">
-                <div class="task-grid">
-                    <label class="task-item"><input type="checkbox" id="task1" value="餵糖"> 餵糖</label>
-                    <label class="task-item"><input type="checkbox" id="task4" value="查產卵"> 查產卵</label>
-                    <label class="task-item"><input type="checkbox" id="task5" value="查王台"> 查王台</label>
-                    <label class="task-item"><input type="checkbox" id="task6" value="治蟎"> 治蟎</label>
-                </div>
-                <div class="input-group-voice">
-                    <input type="text" id="otherTask" placeholder="其他事項 (可語音)">
-                    <button class="btn-voice" onclick="startVoice('otherTask')">🎤</button>
-                </div>
-                
-                <div class="timer-box" style="margin-top: 15px; border-top:1px dashed #ccc; padding-top:10px;">
-                    <label>⏱️ 工作計時器 (分鐘):</label>
-                    <div style="display:flex; gap:5px;">
-                        <input type="number" id="timerMinutes" value="10" style="width:60px;">
-                        <button id="btnStartTimer" class="btn-small">開始</button>
-                        <span id="timerDisplay" style="font-size:1.2em; font-weight:bold; margin-left:10px; color:#e67e22;">00:00</span>
+            <h2 class="section-title">✅ 今日工作</h2>
+            <div class="glass-card tool-card">
+                <div class="card-body">
+                    <div class="task-list">
+                        <label class="task-item"><input type="checkbox" id="task1" value="餵糖水"> <span>餵糖水</span></label>
+                        <label class="task-item"><input type="checkbox" id="task2" value="檢查產卵"> <span>檢查產卵</span></label>
+                        <label class="task-item"><input type="checkbox" id="task3" value="檢查王台"> <span>檢查王台</span></label>
+                        <label class="task-item"><input type="checkbox" id="task4" value="防治蜂蟹蟎"> <span>防治蜂蟹蟎</span></label>
                     </div>
+                    <input type="text" id="taskOther" class="glass-input" placeholder="其他事項...">
+                    <button id="btnGenTask" class="btn-primary">生成清單</button>
+                    <textarea id="outputTask" class="glass-textarea" rows="4"></textarea>
                 </div>
-
-                <button id="btnToDoList" class="btn-action">生成清單</button>
-                <textarea id="toDoListOutput" rows="5"></textarea>
-                <button class="btn-copy" onclick="copyToClipboard('toDoListOutput')">📋 複製</button>
             </div>
         </div>
 
         <div id="tab-settings" class="tab-section">
-            <div class="section-header"><h2>⚙️ 設定</h2></div>
-            <div class="section-card">
-                <h3>備份與還原</h3>
-                <div style="display:flex; gap:10px;">
-                    <button id="btnExportData" class="btn-action" style="background:#2980b9;">匯出 JSON</button>
-                    <button id="btnImportData" class="btn-action" style="background:#8e44ad;">匯入 JSON</button>
-                    <input type="file" id="fileInput" style="display:none;" accept=".json">
-                </div>
-                <hr>
-                <button id="btnClearLocalStorage" class="btn-action btn-danger">清空所有資料</button>
+            <h2 class="section-title">⚙️ 系統設定</h2>
+            <div class="glass-card tool-card">
+                <button id="btnClearAll" class="btn-danger">🗑️ 清空所有資料 (重置)</button>
+                <p style="text-align:center; margin-top:10px; color:#888; font-size:0.8em;">Bee Expert V3.5 Professional</p>
             </div>
         </div>
+
     </main>
 
     <nav class="bottom-nav">
-        <button class="nav-item active" onclick="switchTab('tab-home')"><span class="material-icons nav-icon">dashboard</span><span>首頁</span></button>
-        <button class="nav-item" onclick="switchTab('tab-calc')"><span class="material-icons nav-icon">calculate</span><span>計算</span></button>
-        <button class="nav-item" onclick="switchTab('tab-logs')"><span class="material-icons nav-icon">edit_note</span><span>日誌</span></button>
-        <button class="nav-item" onclick="switchTab('tab-tasks')"><span class="material-icons nav-icon">checklist</span><span>工作</span></button>
-        <button class="nav-item" onclick="switchTab('tab-settings')"><span class="material-icons nav-icon">settings</span><span>設定</span></button>
+        <button class="nav-item active" onclick="switchTab('tab-home')">
+            <span class="material-icons-round">dashboard</span>
+            <small>首頁</small>
+        </button>
+        <button class="nav-item" onclick="switchTab('tab-calc')">
+            <span class="material-icons-round">calculate</span>
+            <small>計算</small>
+        </button>
+        <button class="nav-item" onclick="switchTab('tab-logs')">
+            <span class="material-icons-round">edit_note</span>
+            <small>日誌</small>
+        </button>
+        <button class="nav-item" onclick="switchTab('tab-tasks')">
+            <span class="material-icons-round">checklist</span>
+            <small>工作</small>
+        </button>
+        <button class="nav-item" onclick="switchTab('tab-settings')">
+            <span class="material-icons-round">settings</span>
+            <small>設定</small>
+        </button>
     </nav>
 
     <script src="script.js"></script>
