@@ -964,3 +964,35 @@ function copyToClipboard(elementId) {
         alert("複製失敗，請手動選取複製。");
     });
 }
+// ==========================================
+// 進階功能：自動儲存所有輸入資料 (Auto-Save)
+// ==========================================
+function setupAutoSave() {
+    // 1. 找到畫面上所有的輸入框
+    const inputs = document.querySelectorAll('input, select, textarea');
+
+    // 2. 當資料載入時：把存好的資料填回去
+    inputs.forEach(input => {
+        const savedValue = localStorage.getItem('bee_app_' + input.id);
+        if (savedValue && input.id) {
+            if (input.type === 'checkbox') {
+                input.checked = (savedValue === 'true');
+            } else {
+                input.value = savedValue;
+            }
+        }
+
+        // 3. 當資料變更時：立刻存到瀏覽器
+        input.addEventListener('change', function() {
+            if (this.id) { // 只有設定了 id 的欄位才儲存
+                const valueToSave = (this.type === 'checkbox') ? this.checked : this.value;
+                localStorage.setItem('bee_app_' + this.id, valueToSave);
+            }
+        });
+    });
+    
+    console.log("✅ 自動儲存系統已啟動：您的資料現在很安全！");
+}
+
+// 啟動自動儲存
+document.addEventListener('DOMContentLoaded', setupAutoSave);
